@@ -1,0 +1,25 @@
+# Build output
+/build/
+/.build/
+/.build-*/
+*.dmg
+
+# Local signing identity (private key) — never commit
+/.signing/
+
+# Face models are large and separately licensed; built locally, shipped only in the release DMG
+/Models/*.mlpackage
+/Models/*.mlmodelc
+/buffalo_l/
+*.onnx
+*.zip
+
+# Python
+/tools/.venv/
+__pycache__/
+
+# macOS / Xcode
+.DS_Store
+.swiftpm/
+*.xcuserstate
+DerivedData/

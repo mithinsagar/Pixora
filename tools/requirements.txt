@@ -1,0 +1,9 @@
+# Versions verified on macOS 27 / Python 3.12 (Homebrew) on 2026-11-01.
+# coremltools 9.0 is tested up to torch 2.7; numpy >= 2.3 breaks its torch frontend.
+torch==2.7.0
+torchvision==0.22.0
+coremltools==9.0
+numpy==2.2.6
+scipy==1.18.1
+pillow
+facenet-pytorch==2.6.0  # install with --no-deps (it pins torch<2.3)

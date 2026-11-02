@@ -29,7 +29,7 @@ struct FindView: View {
                         }
                         .padding(14)
                         .background(RoundedRectangle(cornerRadius: 12).fill(Palette.panel))
-                        SlideshowStudio(source: .library, compact: true)
+                        AutoSlideshows()
                     }
                     .padding(24)
                     .frame(maxWidth: 1100, alignment: .leading)

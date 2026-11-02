@@ -11,7 +11,7 @@ Everything runs on your Mac. No account, no internet, and no photo, face or name
 
 ## Download and install
 
-1. Download **Pixora-1.0.0.dmg** from the [latest release](../../releases/latest).
+1. Download the **Pixora .dmg** from the [latest release](../../releases/latest).
 2. Open it and drag **Pixora** onto **Applications**.
 3. The first time, macOS will say it can’t check Pixora for malicious software, because the app isn’t notarised
    by Apple (that needs a paid developer account). Open **System Settings → Privacy & Security**, scroll down and
@@ -238,9 +238,15 @@ It isn’t your Mac login, Apple Account or any other password, and there is no 
 - **What a separate device key protects while locked:** a random device key in the Keychain protects (a) keyed hashes of private photos' paths and fingerprints, so rescans skip them and other copies are caught, and (b) private people's face templates, so new matches can be routed. These are protected at rest, but not by the password.
 - **Not encrypted:** your **original photo files**. Pixora never modifies originals, so a private photo is still readable on its card or drive.
 
-## Slideshow Studio
+## Slideshows
 
-At the bottom of **Find Photos** (and from **Slideshow** in the results bar, or inside Private Space).
+**Slideshows for you.** The bottom of **Find Photos** shows up to four rounded cards, one for each of the people you
+photograph most. Each card slides through that person's best photos on its own (sharp, eyes open, close-ups first, a
+different selection each day when there are plenty), with a slow crossfade and gentle push-in. Nothing to choose:
+click a card and it plays full screen. Cycling pauses while the pointer is over a card; with Reduce Motion the cards
+only fade.
+
+**Make your own** with **Slideshow** in the results bar (after picking people) or inside Private Space:
 
 1. **From:** the people selected above, one person, or photos you choose by hand.
 2. **Style:** *Portraits* (close-ups: a big face, at most one other person), *Together* (everyone you picked),

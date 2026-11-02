@@ -33,7 +33,7 @@ for sz in 16 32 128 256 512; do
 done
 iconutil -c icns $ICONSET -o "$APP/Contents/Resources/AppIcon.icns"
 
-VERSION="${PIXORA_VERSION:-1.0.0}"
+VERSION="${PIXORA_VERSION:-1.1.0}"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

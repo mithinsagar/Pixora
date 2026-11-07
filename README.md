@@ -5,7 +5,7 @@ them by person and remembers the names you give. You can then pick **two or more
 where they all appear together (or where any of them appears), copy them safely into a folder, hide some in an
 encrypted **Private Space**, or play them as a slideshow.
 
-Everything runs on your Mac. No account, and no photo, face or name leaves it. The only part that uses the internet is the optional map in Places, which stays off until you turn it on.
+Everything runs on your Mac. No account, and no photo, face or name leaves it. Only two optional extras use the internet, and only if you ask for them: the map in Places, and the one-time download of the search model.
 
 **Made by Mithin Sagar** · [mithinsagarofficial@gmail.com](mailto:mithinsagarofficial@gmail.com)
 
@@ -271,6 +271,7 @@ Space stays there and closes the moment Private Space locks.
   - `library.sqlite`: names, face templates (512 floats per face), small face crops (192 px JPEG), file paths,
     photo metadata (date, camera, lens, rating, GPS position) and corrections.
   - `Thumbnails/`: 640 px previews, so you can browse with the card ejected.
+  - `Models/Sight/`: the optional search model, if you downloaded it.
 - **Nothing is written next to your photos.** Originals are opened read-only. Export only ever creates new files.
 - **Encryption:** Pixora does not encrypt the library itself; it is protected by your macOS account and FileVault.
 - **Deletion controls:**
@@ -279,7 +280,8 @@ Space stays there and closes the moment Private Space locks.
   - *Erase Everything* deletes the whole library and the thumbnail cache.
   - Removing a source deletes what Pixora learned from it.
 - **Backup / Restore:** an online SQLite backup to a `.pixorabackup` file. It contains biometric data, so keep it private.
-- **The map is the only network use, and it's off by default.** Places loads its map images from Apple Maps once you press **Turn On Map**, so Apple can see which areas you look at. Your photos, faces and names are never sent. Everything else in Pixora works without any network connection.
+- **The search model is downloaded only when you press the button.** It comes from this project's GitHub releases and is checked against a fixed checksum before it's installed. No photo, search or other data is sent. Deep scan results are stored in `library.sqlite`, about 15 KB per photo, and they describe the photo well enough to search it, so treat a backup as private.
+- **The map is off by default.** Places loads its map images from Apple Maps once you press **Turn On Map**, so Apple can see which areas you look at. Your photos, faces and names are never sent. Everything else in Pixora works without any network connection.
 - **A photo's location goes with it.** Making a photo private removes its position from the library along with its row.
 
 ## Cloud processing: compared, and off in this version
@@ -355,6 +357,44 @@ With the card or drive connected, frames are rebuilt from the originals and are 
 ## Looking back
 
 Find Photos opens with photos from this day in past years. A library less than a year old shows this time in an earlier month instead. Click to play them as a slideshow. The card doesn't appear when there's nothing to show.
+
+## Search by what's in a photo
+
+Type "cat", "parrot", "birthday cake" or "a man walking down stairs" and Pixora finds them. Add a name to narrow it down: "asha birthday cake". It's in **Search** (⌘8) in the sidebar, and ⌘K sends anything that isn't a name or date there too.
+
+**It's an optional extra.** Pixora itself stays about 95 MB. Search needs a one-time 1.74 GB download, which only happens when you press the button. After that it works offline, and your photos and searches stay on your Mac. Settings → Search removes it again.
+
+**General or Deep scan.** Before each scan Pixora asks which you want. General finds and groups faces, as always. Deep also reads what's in each photo, at about 1.8 seconds a photo on an M5, so about an hour for 2,000 photos. It runs in the background from the saved previews, so the card can come out once faces are done, you can keep working, and it carries on after a quit. Photos you've already scanned can be deep scanned at any time, with no card.
+
+**Results come in two groups.** *Best matches* are confident. *Maybe* is for doubtful ones, so a guess never looks like an answer. If nothing is close, Pixora says so instead of showing the nearest photos.
+
+**Private Space photos are never read or found.** Making a photo private deletes what the deep scan learned about it, along with its library row.
+
+### How well it works
+
+Measured on labelled photos from the COCO 2017 validation set, which are the same size as Pixora's previews (640 px).
+
+| Candidate, 1,500 photos | Top 10 right, one-word searches | Description finds the exact photo first | Seconds per photo |
+|---|---|---|---|
+| SigLIP 2 giant | 88.5% | 65.9% | 0.35 |
+| PE-Core bigG | 87.8% | 69.0% | 1.06 |
+
+The one-word gap is within chance; PE-Core's lead on descriptions is real. SigLIP 2 was chosen because it's three times faster and smaller, and matches it on the short searches people mostly type. Looking at four overlapping corners as well as the whole photo helped more than the choice of model, so Pixora does that.
+
+| What ships: 8-bit, whole photo plus corners, 750 photos | Result |
+|---|---|
+| Top 10 right, one-word searches | 85.5% (80.5% without corners) |
+| *Best matches* that are right | 93.5% |
+| Clear subjects found as *Best matches* | 63% |
+| Clear subjects found as *Best matches* or *Maybe* | about 80% |
+| First search after opening | about 0.15 seconds, then about 40 ms |
+
+**Limits:**
+- The cut-offs were set on the same 750 photos, so treat those two percentages as a good guide, not a guarantee.
+- **Small things are hard.** A subject filling under 2% of the frame was found about 20% of the time at a strict cut-off, with or without corners.
+- **A search for something absent can still show wrong photos.** At the *Best* level, about a quarter of absent things showed at least one.
+- **Other languages vary.** Hindi, Tamil, Japanese and Spanish ranked cats correctly (10 of 10), but scores run lower, so fewer photos pass the cut-offs. Malayalam did not work (0 of 10 for cat).
+- It reads the 640 px previews, so tiny details and small text are out of reach.
 
 ## Places
 

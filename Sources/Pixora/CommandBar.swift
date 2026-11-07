@@ -20,7 +20,7 @@ struct CommandBar: View {
                 Text("esc").font(Typography.edge).padding(4).overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Palette.rule))
             }
             if !text.isEmpty {
-                FlowChips(understood: parsed.understood, unknown: parsed.unknown)
+                FlowChips(understood: parsed.understood, unknown: searchesPhotos ? [] : parsed.unknown)
                 Text(summary).font(.callout).foregroundStyle(Palette.ink2)
             } else {
                 VStack(alignment: .leading, spacing: 6) {
@@ -54,6 +54,7 @@ struct CommandBar: View {
 
     private var summary: String {
         let p = parsed
+        if searchesPhotos { return "Press Return to search your photos for “\(searchWords)”." }
         if p.people.isEmpty { return "Type a name you’ve given someone in People." }
         var s = "Press Return to show these photos"
         switch p.action {
@@ -65,8 +66,18 @@ struct CommandBar: View {
         return s + "."
     }
 
+    /// Words that aren't a name, date or action describe what's in the photo, once the search model is here.
+    private var searchesPhotos: Bool { model.sight.isReady && !parsed.unknown.isEmpty && parsed.action == .none }
+    private var searchWords: String { text.trimmingCharacters(in: .whitespaces) }
+
     private func run() {
         let p = parsed
+        if searchesPhotos {
+            model.showCommandBar = false
+            model.searchText = searchWords
+            model.section = .search
+            return
+        }
         guard !p.people.isEmpty else { return }
         model.showCommandBar = false
         model.apply(p)

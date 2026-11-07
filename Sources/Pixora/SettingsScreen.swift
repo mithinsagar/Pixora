@@ -4,14 +4,14 @@ import PixoraCore
 /// Settings, in the main window: categories on the left, pages on the right.
 struct SettingsScreen: View {
     enum Page: String, CaseIterable, Identifiable {
-        case privateSpace, appearance, grid, library, scanning, export, privacy, shortcuts, about
+        case privateSpace, appearance, grid, library, scanning, search, export, privacy, shortcuts, about
         var id: String { rawValue }
         var title: String {
-            ["privateSpace": "Private Space", "appearance": "Appearance", "grid": "Photos & Grid", "library": "Library & Storage", "scanning": "Scanning & Recognition",
+            ["privateSpace": "Private Space", "search": "Search", "appearance": "Appearance", "grid": "Photos & Grid", "library": "Library & Storage", "scanning": "Scanning & Recognition",
              "export": "Export", "privacy": "Privacy & Data", "shortcuts": "Keyboard Shortcuts", "about": "About"][rawValue]!
         }
         var icon: String {
-            ["privateSpace": "lock.shield", "appearance": "paintpalette", "grid": "square.grid.3x2", "library": "internaldrive", "scanning": "viewfinder",
+            ["privateSpace": "lock.shield", "search": "magnifyingglass", "appearance": "paintpalette", "grid": "square.grid.3x2", "library": "internaldrive", "scanning": "viewfinder",
              "export": "square.and.arrow.up.on.square", "privacy": "hand.raised", "shortcuts": "keyboard", "about": "info.circle"][rawValue]!
         }
     }
@@ -49,6 +49,7 @@ struct SettingsScreen: View {
                     case .grid: GridPage()
                     case .library: LibraryPage()
                     case .scanning: ScanningPage()
+                    case .search: SearchSettingsPage()
                     case .export: ExportDefaultsPage()
                     case .privacy: PrivacySettings().frame(minHeight: 560); CloudSettings().frame(minHeight: 380)
                     case .shortcuts: ShortcutsPage()
@@ -553,7 +554,7 @@ private struct ExportDefaultsPage: View {
 
 private struct ShortcutsPage: View {
     private let rows: [(String, String)] = [
-        ("⌘K", "Command bar — type “me + asha october solo”"), ("⌘1 … ⌘6", "Find, Review, People, All Photos, Insights, Cards & Folders"),
+        ("⌘K", "Command bar — type “me + asha october solo”"), ("⌘1 … ⌘6", "Find, Review, People, All Photos, Insights, Cards & Folders"), ("⌘7", "Places"), ("⌘8", "Search"),
         ("⌘,", "Settings"), ("⌘O", "Choose a folder to scan"), ("⌘E", "Copy results to a folder"), ("⇧⌘S", "Select mode"),
         ("⌘Z / ⇧⌘Z", "Undo / redo a correction"), ("⌘+ / ⌘−", "Bigger / smaller photos"), ("⌥⌘I", "Show / hide the details panel"),
         ("Space", "View the selected photo large · close the viewer"), ("← →", "Previous / next photo in the viewer"),

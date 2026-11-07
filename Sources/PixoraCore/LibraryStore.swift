@@ -208,6 +208,7 @@ public final class LibraryStore: @unchecked Sendable {
                 """, args: [siblings, file.size, file.mtime, fingerprint, metadata.width, metadata.height, metadata.takenAt,
                             metadata.camera, metadata.lens, metadata.rating, state, error, embeddedID(embedderID, error), importID, photoID])
                 try c.run("DELETE FROM faces WHERE photo_id = ?", photoID)
+                try c.run("DELETE FROM photo_sight WHERE photo_id = ?", photoID)   // the file changed, so look at it again
             } else {
                 photoID = try c.run("""
                 INSERT INTO photos(source_id, rel_path, filename, ext, siblings, file_size, mtime, fingerprint, width, height,

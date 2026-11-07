@@ -50,6 +50,7 @@ struct PixoraApp: App {
                 Button("Insights") { model.section = .insights }.keyboardShortcut("5")
                 Button("Cards & Folders") { model.section = .importer }.keyboardShortcut("6")
                 Button("Places") { model.section = .places }.keyboardShortcut("7")
+                Button("Search") { model.section = .search }.keyboardShortcut("8")
             }
             CommandGroup(after: .toolbar) {
                 Button("Larger Thumbnails") { UserDefaults.standard.set(min(UserDefaults.standard.double(forKey: "tileSize").nonZero(190) + 30, 360), forKey: "tileSize") }

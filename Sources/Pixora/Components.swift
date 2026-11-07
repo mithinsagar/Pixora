@@ -456,6 +456,8 @@ struct PhotoGrid: View {
     var onOpen: ((Int64) -> Void)? = nil
     var viewerTitle = "Photos"
     var headerBackground: Color? = nil
+    /// Sections other than by day, for photos in an order of their own.
+    var groupTitle: ((Photo) -> String)? = nil
     @AppStorage("tileSize") private var tileSize: Double = 190
 
     var body: some View {
@@ -573,7 +575,7 @@ struct PhotoGrid: View {
     private var grouped: [DayGroup] {
         var out: [DayGroup] = []
         for (i, item) in items.enumerated() {
-            let title = item.photo.takenAt.map { Format.day.string(from: $0) } ?? "No date"
+            let title = groupTitle?(item.photo) ?? item.photo.takenAt.map { Format.day.string(from: $0) } ?? "No date"
             let entry = GridEntry(index: i, photo: item.photo, info: item.info)
             if out.last?.title == title { out[out.count - 1].entries.append(entry) } else { out.append(DayGroup(title: title, entries: [entry])) }
         }

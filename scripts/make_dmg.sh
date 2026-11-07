@@ -20,7 +20,8 @@ Pixora $VERSION, made by Mithin Sagar (mithinsagarofficial@gmail.com)
    isn't notarised by Apple. Open System Settings → Privacy & Security, scroll down and click "Open Anyway"
    next to the Pixora message, then confirm. You only need to do this once.
 
-Pixora runs entirely on your Mac: no account, no internet, and nothing is uploaded.
+Pixora runs on your Mac: no account, and your photos are never uploaded. Only two optional extras use the internet,
+and only if you turn them on: the map in Places, and the one-time download of the search model.
 It never changes, moves or deletes your original photos.
 
 Source code: MIT License (LICENSE.txt). The bundled face models are InsightFace's, for non-commercial use only

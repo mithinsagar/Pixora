@@ -13,6 +13,7 @@ struct ContentView: View {
             Group {
                 switch model.section {
                 case .find: FindView()
+                case .search: SearchView()
                 case .review: ReviewView()
                 case .people: PeopleView()
                 case .allPhotos: AllPhotosView()
@@ -61,6 +62,7 @@ struct ContentView: View {
         .onAppear {
             model.undoManager = undoManager
             TileDragger.shared.start(model: model)
+            model.sight.resumeIfInterrupted()
             if model.isImmersive { DispatchQueue.main.async { setWindowChrome(hidden: true) } }
         }
         .onChange(of: undoManager) { model.undoManager = undoManager }
@@ -115,6 +117,7 @@ private struct Sidebar: View {
             List(selection: Binding(get: { model.section }, set: { if let s = $0 { model.section = s; if s == .people { model.openPersonID = nil } } })) {
                 Section("Library") {
                     Label("Find Photos", systemImage: "person.2.crop.square.stack").tag(SidebarItem.find)
+                    Label("Search", systemImage: "magnifyingglass").tag(SidebarItem.search)
                     Label("Review", systemImage: "tray.full")
                         .badge(model.stats.reviewItems)
                         .tag(SidebarItem.review)

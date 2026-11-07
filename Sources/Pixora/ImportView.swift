@@ -189,6 +189,7 @@ struct ScanSheet: View {
                 if p.videosSkipped > 0 { note("video.slash", "\(p.videosSkipped) videos skipped (photos only).") }
                 if !p.unreadable.isEmpty { note("lock", "\(p.unreadable.count) items couldn’t be read (permissions).") }
             }
+            scanKind(photos: selected.count)
             HStack {
                 Button("Cancel") { session.cancel() }.keyboardShortcut(.cancelAction)
                 Spacer()
@@ -196,6 +197,33 @@ struct ScanSheet: View {
                     .buttonStyle(PrimaryButtonStyle()).keyboardShortcut(.defaultAction).disabled(selected.isEmpty)
             }
         }
+    }
+
+    /// General is today's face scan. Deep also learns what's in each photo, which takes longer, so it's a choice each time.
+    private func scanKind(photos: Int) -> some View {
+        let sight = model.sight
+        let extra = sight.estimate(photos: max(0, photos - session.alreadyScanned) + sight.pending)
+        let detail = sight.isReady ? "Also makes photos searchable, like “cat” or “sunset”. Adds about \(Format.duration(extra)) in the background, and the card can come out once faces are done."
+            : "Also makes photos searchable, like “cat” or “sunset”. Needs a one-time \(Format.size(Sight.downloadBytes)) download, then about \(Format.duration(extra)) in the background."
+        return HStack(alignment: .top, spacing: 10) {
+            scanKindCard("General Scan", "person.2", "Finds and groups faces.", selected: !session.deep) { session.deep = false }
+            scanKindCard("Deep Scan", "sparkle.magnifyingglass", detail, selected: session.deep) { session.deep = true }
+        }
+    }
+
+    private func scanKindCard(_ title: String, _ icon: String, _ detail: String, selected: Bool, choose: @escaping () -> Void) -> some View {
+        Button(action: choose) {
+            VStack(alignment: .leading, spacing: 5) {
+                Label(title, systemImage: icon).font(.system(size: 13, weight: .semibold))
+                Text(detail).font(.caption).foregroundStyle(Palette.ink2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(12).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(selected ? Palette.safelight.opacity(0.14) : Palette.card))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(selected ? Palette.safelight : Palette.rule, lineWidth: selected ? 1.5 : 1))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     @ViewBuilder private var progressBody: some View {

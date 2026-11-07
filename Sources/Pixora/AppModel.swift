@@ -3,7 +3,7 @@ import AppKit
 import PixoraCore
 
 enum SidebarItem: Hashable {
-    case find, review, people, allPhotos, places, insights, importer, settings, privateSpace
+    case find, search, review, people, allPhotos, places, insights, importer, settings, privateSpace
 }
 
 /// Find results arranged for display: strong shots first, weaker ones (eyes closed, soft, extra burst frames)
@@ -33,6 +33,8 @@ struct CardPrompt: Identifiable, Equatable {
 @MainActor @Observable
 final class AppModel {
     let store: LibraryStore
+    @ObservationIgnored lazy var sight = SightCenter(store: store)
+    var searchText = ""
     let vault: PrivateVault
     /// Decrypted Private Space content while unlocked; nil when locked.
     var privateContent: PrivateVault.Content?
@@ -156,6 +158,7 @@ final class AppModel {
         case "all": section = .allPhotos
         case "import": section = .importer
         case "settings": section = .settings
+        case "search": section = .search; searchText = env["PIXORA_SEARCH"] ?? ""
         case "places": section = .places
         case "private": section = .privateSpace
         default: break
@@ -606,6 +609,8 @@ final class ScanSession: Identifiable {
     var alreadyScanned = 0
     var progress = ScanProgress()
     var isPaused = false
+    /// Also learn what's in each photo. Remembered as the choice for next time, but still asked every time.
+    var deep = UserDefaults.standard.bool(forKey: "deepScanChosen") { didSet { UserDefaults.standard.set(deep, forKey: "deepScanChosen") } }
     private var engine: ScanEngine?
     private var task: Task<Void, Never>?
     private var scanWork: Task<ScanProgress, Never>?
@@ -657,6 +662,8 @@ final class ScanSession: Identifiable {
             self?.stage = .done
             self?.model.clearUndoHistory()
             self?.model.refreshAll()
+            self?.model.sight.refreshCounts()
+            if self?.deep == true { self?.model.sight.requestScan() }
         }
     }
 

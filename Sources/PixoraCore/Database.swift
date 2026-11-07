@@ -243,6 +243,8 @@ enum Schema {
         // v5 — where photos were taken. Its own table, so a photo made private takes its location with it. A row
         // with no position means the photo was checked and has no GPS tag.
         try c.exec("CREATE TABLE IF NOT EXISTS photo_places(photo_id INTEGER PRIMARY KEY REFERENCES photos(id) ON DELETE CASCADE, lat REAL, lon REAL)")
+        // v6 — what's in each photo, from a deep scan. Its own table for the same reason.
+        try c.exec("CREATE TABLE IF NOT EXISTS photo_sight(photo_id INTEGER PRIMARY KEY REFERENCES photos(id) ON DELETE CASCADE, model TEXT NOT NULL, vectors BLOB NOT NULL)")
     }
 
     private static func addColumn(_ c: Connection, _ table: String, _ column: String, _ decl: String) throws {

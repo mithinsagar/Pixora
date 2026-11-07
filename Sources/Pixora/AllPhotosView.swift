@@ -17,6 +17,13 @@ struct AllPhotosView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .bottom) {
                     SectionHeader(title: "All Photos", subtitle: "\(Format.count(photos.count, "photo")) shown · \(model.stats.scanned.formatted()) scanned in total")
+                    Button { model.quickPick = QuickPickRequest(title: "All Photos", photos: photos) } label: {
+                        Label("Quick Pick", systemImage: "hand.draw").font(.system(size: 13, weight: .semibold))
+                            .padding(.horizontal, 13).padding(.vertical, 7)
+                            .background(Capsule().fill(Palette.card)).overlay(Capsule().strokeBorder(Palette.rule)).foregroundStyle(Palette.ink)
+                    }
+                    .buttonStyle(.plain).hoverLift(scale: 1.04, radius: 16).disabled(photos.isEmpty)
+                    .help("Go through these one at a time: keep, favorite or skip")
                     SelectToggle(selecting: $selecting)
                 }
                 filterBar
@@ -39,6 +46,9 @@ struct AllPhotosView: View {
             if selecting {
                 SelectionBar(selected: photos.filter { selected.contains($0.id) }, total: photos.count, title: "Selected photos",
                              selectAll: { selected = Set(photos.map(\.id)) }, selectNone: { selected = [] },
+                             selectFavorites: !photos.contains { model.favorites.contains($0.id) } ? nil : {
+                                 selected = Set(photos.map(\.id)).intersection(model.favorites)
+                             },
                              done: { selecting = false; selected = [] })
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }

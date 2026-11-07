@@ -82,6 +82,8 @@ public struct PhotoMetadata: Sendable {
     public var camera: String?
     public var lens: String?
     public var rating: Int?
+    public var latitude: Double?
+    public var longitude: Double?
 }
 
 public enum ImageLoader {
@@ -139,6 +141,12 @@ public enum ImageLoader {
         if let xmpRating = props["Rating" as CFString] as? Int { m.rating = xmpRating }
         if m.rating == nil, let iptc = props[kCGImagePropertyIPTCDictionary] as? [CFString: Any],
            let r = iptc[kCGImagePropertyIPTCStarRating] as? Int { m.rating = r }
+        if let gps = props[kCGImagePropertyGPSDictionary] as? [CFString: Any],
+           let lat = gps[kCGImagePropertyGPSLatitude] as? Double, let lon = gps[kCGImagePropertyGPSLongitude] as? Double,
+           abs(lat) <= 90, abs(lon) <= 180, lat != 0 || lon != 0 {   // 0,0 is what cameras write before they have a fix
+            m.latitude = (gps[kCGImagePropertyGPSLatitudeRef] as? String) == "S" ? -lat : lat
+            m.longitude = (gps[kCGImagePropertyGPSLongitudeRef] as? String) == "W" ? -lon : lon
+        }
         return m
     }
 

@@ -3,7 +3,7 @@ import AppKit
 import PixoraCore
 
 enum SidebarItem: Hashable {
-    case find, review, people, allPhotos, insights, importer, settings, privateSpace
+    case find, review, people, allPhotos, places, insights, importer, settings, privateSpace
 }
 
 /// Find results arranged for display: strong shots first, weaker ones (eyes closed, soft, extra burst frames)
@@ -40,6 +40,7 @@ final class AppModel {
     var privateRevealID: UUID?
     /// Bumped when Private Space is created or erased, so views re-read the (non-observable) vault.
     var vaultEpoch = 0
+    @ObservationIgnored var vaultSetUpCache: (epoch: Int, isSetUp: Bool)?
     /// Private Space was just created and setup is showing its second step (keep a copy of the password).
     var privateSetupInProgress = false
     /// Show the delete-and-recreate sheet (forgotten password), from anywhere.
@@ -97,6 +98,10 @@ final class AppModel {
     }
     var showCommandBar = false
     var viewer: ViewerState?
+    var quickPick: QuickPickRequest?
+    var faceTime: FaceTimeRequest?
+    /// A full-window photo screen is showing.
+    var isImmersive: Bool { viewer != nil || quickPick != nil || faceTime != nil }
     /// The window's undo manager (set by ContentView), so ⌘Z / ⇧⌘Z undo and redo corrections.
     weak var undoManager: UndoManager?
     var toast: Toast?
@@ -151,6 +156,7 @@ final class AppModel {
         case "all": section = .allPhotos
         case "import": section = .importer
         case "settings": section = .settings
+        case "places": section = .places
         case "private": section = .privateSpace
         default: break
         }
@@ -181,10 +187,28 @@ final class AppModel {
         #endif
         if let name = env["PIXORA_PERSON"], let p = namedPeople.first(where: { $0.displayName == name }) { section = .people; openPersonID = p.id }
         if env["PIXORA_VIEWER"] != nil, let first = visibleResults.first { openViewer(visibleResults.map(\.photo), at: first.id, title: querySentence) }
+        #if PIXORA_UI_TESTING
+        if let n = env["PIXORA_TEST_FAVORITES"].flatMap(Int.init) {
+            toggleFavorite(results.prefix(n).map(\.photo))
+            selectFavorites()
+            requestExport()
+            fputs("favorites selected: \(exportablePhotos.count), export request: \(exportRequest?.results.count ?? -1), of \(results.count)\n", stderr)
+            exportRequest = nil
+        }
+        #endif
         if env["PIXORA_SELECTING"] != nil {
             findSelecting = true
             for r in visibleResults.prefix(3) { toggleExport(r.id) }
         }
+        #if PIXORA_UI_TESTING
+        switch env["PIXORA_TEST_OPEN"] {
+        case "quickpick": quickPick = QuickPickRequest(title: querySentence, photos: visibleResults.map(\.photo))
+        case "facetime":
+            if let id = selectedPeople.first, let p = person(id) { faceTime = FaceTimeRequest(personID: id, name: p.displayName) }
+        default: break
+        }
+        if let script = env["PIXORA_TEST_SCRIPT"] { Rehearsal.run(script, model: self) }
+        #endif
     }
 
     // MARK: Refresh
@@ -286,6 +310,22 @@ final class AppModel {
     func setExportAll(_ include: Bool) {
         let ids = Set(visibleResults.map(\.id))
         if include { userIncluded.formUnion(ids); userExcluded.subtract(ids) } else { userExcluded.formUnion(ids); userIncluded.subtract(ids) }
+        arrange()
+    }
+
+    /// How many of the current results are favorites, whether or not they're showing right now.
+    var favoriteResultCount: Int { results.lazy.filter { self.favorites.contains($0.id) }.count }
+
+    /// Select exactly the favorites in these results. One hidden behind "best shots only" or stacked in a burst is
+    /// brought into view first, because only what's showing gets copied.
+    func selectFavorites() {
+        let all = Set(results.map(\.id))
+        let chosen = all.intersection(favorites)
+        guard !chosen.isEmpty else { return }
+        if bestOnly { bestOnly = false }
+        expandedBursts.formUnion(results.filter { chosen.contains($0.id) }.compactMap(\.burstID))
+        userIncluded = chosen
+        userExcluded = all.subtracting(chosen)
         arrange()
     }
 
@@ -502,8 +542,29 @@ final class AppModel {
 
     // Tiles register their view so the viewer can zoom from / back to the exact spot. Not observed: no re-renders.
     @ObservationIgnored private var tileViews: [Int64: WeakView] = [:]
-    func registerTile(_ id: Int64, _ view: NSView?) { if let view { tileViews[id] = WeakView(view: view) } }
-    func unregisterTile(_ id: Int64, _ view: NSView?) { if tileViews[id]?.view === view { tileViews[id] = nil } }
+    @ObservationIgnored private var tilePhotos: [Int64: Photo] = [:]
+    /// What's picked in the grid on screen while selecting: dragging one of these carries them all.
+    @ObservationIgnored var dragSelection: [Photo] = []
+    func registerTile(_ photo: Photo, _ view: NSView?) {
+        guard let view else { return }
+        tileViews[photo.id] = WeakView(view: view)
+        tilePhotos[photo.id] = photo
+    }
+    func unregisterTile(_ id: Int64, _ view: NSView?) {
+        guard tileViews[id]?.view === view else { return }
+        tileViews[id] = nil
+        tilePhotos[id] = nil
+    }
+
+    /// The photo tile under a mouse event, if there is one.
+    func tile(at event: NSEvent) -> (photo: Photo, view: NSView)? {
+        for (id, entry) in tileViews {
+            guard let view = entry.view, view.window === event.window, let photo = tilePhotos[id] else { continue }
+            let point = view.convert(event.locationInWindow, from: nil)
+            if view.bounds.contains(point) && view.visibleRect.contains(point) { return (photo, view) }
+        }
+        return nil
+    }
 
     /// A tile's picture area in window (SwiftUI global) coordinates, if it is on screen.
     func tileFrame(_ id: Int64) -> CGRect? {

@@ -36,6 +36,8 @@ final class ImageCache: @unchecked Sendable {
     }
 
     func forget(photoIDs: [Int64]) { for id in photoIDs { photos.removeObject(forKey: id as NSNumber) } }
+    /// The thumbnail if it's in memory, without waiting.
+    func cached(_ id: Int64) -> NSImage? { photos.object(forKey: id as NSNumber) }
 
     func photoThumb(_ photo: Photo, sourceRoot: URL?) async -> NSImage? {
         if let hit = photos.object(forKey: photo.id as NSNumber) { return hit }
@@ -288,6 +290,15 @@ struct PhotoTile: View {
                     }.padding(6)
                 }
             }
+            .overlay(alignment: .bottomTrailing) {
+                if !hovering && model.favorites.contains(photo.id) {
+                    Image(systemName: "heart.fill").font(.system(size: 11, weight: .bold)).foregroundStyle(.white)
+                        .frame(width: 22, height: 22).background(Circle().fill(Color.pink.opacity(0.9))).padding(6)
+                        .transition(.scale(scale: 0.3).combined(with: .opacity))
+                        .accessibilityHidden(true)
+                }
+            }
+            .animation(Motion.pop, value: model.favorites.contains(photo.id))
             .overlay(alignment: .topLeading) { includeToggle }
             .overlay(alignment: .topTrailing) { if ThemeManager.shared.showQualityBadges { badges.padding(6) } }
             .overlay(RoundedRectangle(cornerRadius: corner).strokeBorder(isInspected || (selecting && isIncluded == true) ? Palette.safelight : .clear,
@@ -295,12 +306,8 @@ struct PhotoTile: View {
             .opacity(isIncluded == false ? (selecting ? 0.75 : 0.5) : 1)
             .hoverLift(scale: 1.04, radius: corner, glow: true)
             .onHover { inside in withAnimation(.easeOut(duration: 0.15)) { hovering = inside } }
-            .onDrag {
-                // Drag one photo out to Finder / Messages / Mail.
-                fileURL.flatMap { NSItemProvider(contentsOf: $0) } ?? NSItemProvider()
-            }
             .background(ShareAnchor(view: $anchor))
-            .onChange(of: anchor) { _, v in model.registerTile(photo.id, v) }
+            .onChange(of: anchor) { _, v in model.registerTile(photo, v) }
             .onDisappear { model.unregisterTile(photo.id, anchor) }
             if ThemeManager.shared.showFilenames {
                 HStack(spacing: 6) {
@@ -363,6 +370,13 @@ struct PhotoTile: View {
             HStack(spacing: 6) {
                 if let d = photo.takenAt { Text(Format.day.string(from: d)).font(.system(size: 10)).foregroundStyle(.white.opacity(0.8)).lineLimit(1).fixedSize() }
                 Spacer()
+                if photo.id > 0 {
+                    let favorite = model.favorites.contains(photo.id)
+                    quickButton(favorite ? "heart.fill" : "heart", favorite ? "Remove from favorites" : "Add to favorites", bounce: favorite) {
+                        model.toggleFavorite([photo])
+                        Haptics.tick()
+                    }
+                }
                 if let onView { quickButton("arrow.up.left.and.arrow.down.right", "View full photo") { onView() } }
                 quickButton("square.and.arrow.up", "Share") { model.share([photo], from: anchor) }
                 quickButton("folder", "Show in Finder") { if let u = fileURL { NSWorkspace.shared.activateFileViewerSelecting([u]) } }
@@ -374,9 +388,10 @@ struct PhotoTile: View {
         .background(LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .center, endPoint: .bottom))
     }
 
-    private func quickButton(_ icon: String, _ label: String, action: @escaping () -> Void) -> some View {
+    private func quickButton(_ icon: String, _ label: String, bounce: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon).font(.system(size: 11, weight: .semibold)).frame(width: 24, height: 24)
+                .symbolEffect(.bounce, value: bounce)
                 .background(Circle().fill(.white.opacity(0.18))).foregroundStyle(.white)
         }.buttonStyle(.plain).help(label).accessibilityLabel(label)
     }
@@ -401,6 +416,7 @@ struct PhotoTile: View {
         if let d = photo.takenAt { parts.append(Format.day.string(from: d)) }
         let names = info.matches.map { m in (model.person(m.personID)?.displayName ?? "") + (m.state.isCertain ? "" : " (uncertain)") }
         if !names.isEmpty { parts.append(names.joined(separator: ", ")) }
+        if model.favorites.contains(photo.id) { parts.append("favorite") }
         if info.isBest { parts.append("best shot") }
         if info.eyesClosed { parts.append("eyes may be closed") }
         if info.soft { parts.append("soft focus") }
@@ -455,6 +471,7 @@ struct PhotoGrid: View {
                                 HStack(alignment: .top, spacing: Self.gap) {
                                     ForEach(row.cells, id: \.entry.id) { cell in tile(cell.entry, photos: photos, size: cell.size) }
                                 }
+                                .scrollEntrance()
                             }
                         } header: { header(group.title, count: group.entries.count) }
                     }
@@ -480,6 +497,17 @@ struct PhotoGrid: View {
                 .padding(.horizontal, 24).padding(.bottom, 24)
             }
         }
+        .onChange(of: picked, initial: true) { _, photos in model.dragSelection = photos }
+        .onDisappear { model.dragSelection = [] }
+    }
+
+    /// The photos picked in Select mode, in grid order.
+    private var picked: [Photo] {
+        guard selecting else { return [] }
+        let all = items.map(\.photo) + weaker.map(\.photo)
+        if let selected { return all.filter { selected.contains($0.id) } }
+        if let excluded { return all.filter { !excluded.contains($0.id) } }
+        return []
     }
 
     static var gap: CGFloat { CGFloat(ThemeManager.shared.gridGap) }
@@ -610,6 +638,8 @@ struct SelectionBar: View {
     var title = "Selected photos"
     let selectAll: () -> Void
     let selectNone: () -> Void
+    /// Picks only the favorites among these photos; nil when there are none.
+    var selectFavorites: (() -> Void)? = nil
     let done: () -> Void
     @State private var anchor: NSView?
 
@@ -620,7 +650,14 @@ struct SelectionBar: View {
             EdgeLabel("of \(total) selected")
             Button("Select All", action: selectAll).controlSize(.small)
             Button("None", action: selectNone).controlSize(.small).disabled(selected.isEmpty)
+            if let selectFavorites {
+                Button(action: selectFavorites) { Label("Favorites", systemImage: "heart.fill") }.controlSize(.small)
+                    .help("Select only your favorites, ready to copy")
+            }
             Spacer()
+            Button { model.toggleFavorite(selected) } label: {
+                Label("Favorite", systemImage: !selected.isEmpty && selected.allSatisfy { model.favorites.contains($0.id) } ? "heart.fill" : "heart")
+            }.disabled(selected.isEmpty).help("Add these to your favorites, or remove them if they all are already")
             DragOutHandle(urls: { model.fileURLs(for: selected) }, label: "Drag \(selected.count)").fixedSize()
             Button { model.share(selected, from: anchor) } label: { Label("AirDrop / Share", systemImage: "square.and.arrow.up") }
                 .background(ShareAnchor(view: $anchor)).disabled(selected.isEmpty)

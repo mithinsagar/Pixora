@@ -28,11 +28,13 @@ struct FindView: View {
                                 .font(.callout).foregroundStyle(Palette.ink2).fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(RoundedRectangle(cornerRadius: 12).fill(Palette.panel))
+                        MemoryCard()
                         AutoSlideshows()
                     }
                     .padding(24)
-                    .frame(maxWidth: 1100, alignment: .leading)
+                    .frame(maxWidth: 2400, alignment: .leading)
                     .frame(maxWidth: .infinity)
                 }
             } else if model.visibleResults.isEmpty {
@@ -238,21 +240,30 @@ struct FindView: View {
         let single = model.selectedPeople.count == 1 ? model.person(model.selectedPeople.first) : nil
         @Bindable var model = model
         return HStack(spacing: 12) {
-            SelectToggle(selecting: $model.findSelecting)
+            SelectToggle(selecting: $model.findSelecting).fixedSize()
             if model.findSelecting {
                 Text("\(included)").font(.system(size: 20, weight: .semibold, design: .serif)).monospacedDigit()
                     .contentTransition(.numericText()).animation(.snappy, value: included)
-                EdgeLabel("selected — click photos to pick them")
+                EdgeLabel("selected").fixedSize()
             } else {
-                EdgeLabel("\(included) of \(model.visibleResults.count) selected")
+                Text("\(included) of \(model.visibleResults.count) selected".uppercased()).font(Typography.edge).tracking(1.1).foregroundStyle(Palette.ink2)
+                    .lineLimit(1).fixedSize().rollingNumber(included)
             }
-            Button("All") { model.setExportAll(true) }.controlSize(.small)
-            Button("None") { model.setExportAll(false) }.controlSize(.small)
+            Button("All") { model.setExportAll(true) }.controlSize(.small).fixedSize()
+            Button("None") { model.setExportAll(false) }.controlSize(.small).fixedSize()
+            if model.favoriteResultCount > 0 {
+                Button { model.selectFavorites() } label: { Label("Favorites (\(model.favoriteResultCount))", systemImage: "heart.fill") }
+                    .controlSize(.small).fixedSize().help("Select only your favorites, ready to copy")
+            }
             Spacer()
+            if model.findSelecting {
+                Button { model.toggleFavorite(model.exportablePhotos) } label: { Label("Favorite", systemImage: "heart") }
+                    .fixedSize().disabled(included == 0).help("Add these to your favorites, or remove them if they all are already")
+            }
             DragOutHandle(urls: { model.fileURLs(for: model.exportablePhotos) }, label: "Drag \(included)")
                 .fixedSize()
             Button { model.share(model.exportablePhotos, from: shareAnchor) } label: { Label("Share", systemImage: "square.and.arrow.up") }
-                .background(ShareAnchor(view: $shareAnchor))
+                .background(ShareAnchor(view: $shareAnchor)).fixedSize()
                 .help("AirDrop, Messages, Mail…").disabled(included == 0)
             if let single, !single.contactHandles.isEmpty {
                 Menu {
@@ -266,13 +277,24 @@ struct FindView: View {
                 } label: { Label("Send to \(single.displayName)", systemImage: "paperplane") }
                 .fixedSize().disabled(included == 0)
             }
-            Button { model.makeContactSheet(model.exportablePhotos, title: model.querySentence) } label: { Label("Contact Sheet", systemImage: "doc.richtext") }
-                .disabled(included == 0).help("Printable PDF proof sheet")
-            Button { showStudio = true } label: { Label("Slideshow", systemImage: "play.rectangle") }
-                .help("Make a slideshow from these people")
-            Button { model.recapRequest = RecapRequest(title: model.querySentence, photos: model.visibleResults.map(\.photo)) } label: {
-                Label("Recap", systemImage: "rectangle.portrait.on.rectangle.portrait")
-            }.help("A shareable recap card for these photos")
+            Menu {
+                Button { model.quickPick = QuickPickRequest(title: model.querySentence, photos: model.visibleResults.map(\.photo)) } label: {
+                    Label("Quick Pick", systemImage: "hand.draw")
+                }
+                if let single {
+                    Button { model.faceTime = FaceTimeRequest(personID: single.id, name: single.displayName) } label: {
+                        Label("\(single.displayName) Through Time", systemImage: "clock.arrow.circlepath")
+                    }
+                }
+                Divider()
+                Button { showStudio = true } label: { Label("Slideshow", systemImage: "play.rectangle") }
+                Button { model.makeContactSheet(model.exportablePhotos, title: model.querySentence) } label: { Label("Contact Sheet", systemImage: "doc.richtext") }
+                    .disabled(included == 0)
+                Button { model.recapRequest = RecapRequest(title: model.querySentence, photos: model.visibleResults.map(\.photo)) } label: {
+                    Label("Recap", systemImage: "rectangle.portrait.on.rectangle.portrait")
+                }
+            } label: { Label("More", systemImage: "ellipsis.circle") }
+            .fixedSize().help("Quick Pick, Through Time, slideshow, contact sheet and recap card")
             Button { model.requestExport() } label: {
                 Label(model.findSelecting ? "Copy to Folder…" : "Copy \(Format.count(included, "Photo")) to Folder…", systemImage: "square.and.arrow.down.on.square")
                     .lineLimit(1)

@@ -5,7 +5,7 @@ them by person and remembers the names you give. You can then pick **two or more
 where they all appear together (or where any of them appears), copy them safely into a folder, hide some in an
 encrypted **Private Space**, or play them as a slideshow.
 
-Everything runs on your Mac. No account, no internet, and no photo, face or name leaves it.
+Everything runs on your Mac. No account, and no photo, face or name leaves it. The only part that uses the internet is the optional map in Places, which stays off until you turn it on.
 
 **Made by Mithin Sagar** · [mithinsagarofficial@gmail.com](mailto:mithinsagarofficial@gmail.com)
 
@@ -246,7 +246,7 @@ different selection each day when there are plenty), with a slow crossfade and g
 click a card and it plays full screen. Cycling pauses while the pointer is over a card; with Reduce Motion the cards
 only fade.
 
-**Make your own** with **Slideshow** in the results bar (after picking people) or inside Private Space:
+**Make your own** with **More → Slideshow** in the results bar (after picking people) or inside Private Space:
 
 1. **From:** the people selected above, one person, or photos you choose by hand.
 2. **Style:** *Portraits* (close-ups: a big face, at most one other person), *Together* (everyone you picked),
@@ -269,7 +269,7 @@ Space stays there and closes the moment Private Space locks.
 
 - **Stored locally only**, in `~/Library/Application Support/Pixora`:
   - `library.sqlite`: names, face templates (512 floats per face), small face crops (192 px JPEG), file paths,
-    photo metadata (date, camera, lens, rating) and corrections.
+    photo metadata (date, camera, lens, rating, GPS position) and corrections.
   - `Thumbnails/`: 640 px previews, so you can browse with the card ejected.
 - **Nothing is written next to your photos.** Originals are opened read-only. Export only ever creates new files.
 - **Encryption:** Pixora does not encrypt the library itself; it is protected by your macOS account and FileVault.
@@ -279,7 +279,8 @@ Space stays there and closes the moment Private Space locks.
   - *Erase Everything* deletes the whole library and the thumbnail cache.
   - Removing a source deletes what Pixora learned from it.
 - **Backup / Restore:** an online SQLite backup to a `.pixorabackup` file. It contains biometric data, so keep it private.
-- **No network code.** The app makes no network requests.
+- **The map is the only network use, and it's off by default.** Places loads its map images from Apple Maps once you press **Turn On Map**, so Apple can see which areas you look at. Your photos, faces and names are never sent. Everything else in Pixora works without any network connection.
+- **A photo's location goes with it.** Making a photo private removes its position from the library along with its row.
 
 ## Cloud processing: compared, and off in this version
 
@@ -309,24 +310,82 @@ on film (`▸0012 IMG_4821.CR3`).
 - **Layout:** a three-column `NavigationSplitView` (sidebar · content · inspector) with adaptive grids. The minimum
   window is 1000 × 660; thumbnail size changes with ⌘+ / ⌘−.
 
+## Dragging a photo out
+
+Drag any photo from a grid onto the Desktop, a Finder window, Messages or Mail. To drag several, press **Select**, pick them, and drag any one of them: they all go together. It's always a copy: the originals stay exactly where they are. With the card or drive disconnected, Pixora copies small previews instead, named "preview" so they can't be mistaken for the full photos, and tells you it did.
+
+## Favorites
+
+Mark a photo with ♥ from the heart on its tile, the viewer (**L**), or the right-click menu. To mark several at once, press **Select**, pick them, and press **Favorite**. Favorites show a pink heart on their tile.
+
+**To copy only your favorites:** pick a person in Find Photos, press **Favorites** in the bar at the bottom, then **Copy Photos to Folder**. A favorite hidden in a stacked burst or behind "best shots only" is brought into view first, so it is not left out. The same button is in **Select** mode on a person's page and in All Photos.
+
+## The full photo view
+
+The background takes on the colours of the photo, and the arrows and zoom control fade away when the pointer rests. Turn the glow off in **Settings → Photos & Grid**.
+
+- **Swipe with two fingers, or click and drag,** to move between photos. The next photo follows your fingers, and a quick flick is enough.
+- **Swipe up or down** to close. The photo shrinks back into its tile.
+- **Holding an arrow key** runs through photos quickly.
+
+## Lifting a subject out of a photo
+
+Press and hold on someone in the full photo view, press firmly on a Force Touch trackpad, or press **C**. Pixora lifts them off the photo, on this Mac, using the same system feature as Photos. Press and hold on one person to lift only them; **C** lifts everyone. Then drag them out to Finder, Messages or Keynote as a transparent PNG, or use **Copy** or **Save PNG**. The original isn't touched, and it isn't available for Private Space photos, because a drag has to write a temporary file.
+
+## Quick Pick
+
+Go through a set of photos one at a time, full screen. Find it in **More** in Find Photos, on a person's page, and in All Photos.
+
+| Key or swipe | Action |
+|---|---|
+| ← or swipe left | Skip |
+| → or swipe right | Keep |
+| ↑ or swipe up | Favorite |
+| Z or Delete | Undo |
+| Esc | Finish |
+
+Pinch or double-click to check focus. At the end you can copy your picks, copy only the favorites, or play them as a slideshow. Skipping only moves on: nothing is removed from your library.
+
+## Through Time
+
+Open a person and press **Through Time**, or find it in **More** in Find Photos. Every photo of them is lined up on the eyes, so dragging along the timeline, or two-finger scrolling, shows one face changing. It picks sharp, open-eyed photos facing the camera and spreads them across the time you have, whether that's ten years or one afternoon. Press **Save Video** to keep it as a movie.
+
+With the card or drive connected, frames are rebuilt from the originals and are much sharper. Nothing here is saved unless you save the video.
+
+## Looking back
+
+Find Photos opens with photos from this day in past years. A library less than a year old shows this time in an earlier month instead. Click to play them as a slideshow. The card doesn't appear when there's nothing to show.
+
+## Places
+
+Photos on a map, from the location saved in each one. Pins group as you zoom out and split as you zoom in; click one to zoom in or open its photos. Locations are read when photos are scanned, or from connected cards for photos scanned earlier. Most cameras only save a location with GPS or a phone link switched on, so many libraries have none. See [Privacy and data](#privacy-and-data) for how the map works.
+
+## Zooming in the viewer
+
+Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scroll or drag moves around the zoomed photo. Double-click or double-tap with two fingers to switch between fit and 250%. With a mouse, hold ⌘ and scroll. The **+**, **−** and **0** keys and the control under the photo do the same. Zooming in loads the full-size original when it is larger than the viewer's normal 3200 px.
+
 **Keyboard shortcuts:**
 
 | Shortcut | Action |
 |---|---|
-| ⌘1–5 | Switch section |
+| ⌘1–7 | Switch section |
 | ⌘O | Choose folder |
 | ⌘E | Export |
 | ⌥⌘I | Show/hide inspector |
 | ⌘[ | Back |
 | Y / N / → | Yes / No / Skip in Review |
 | Space | Pause/resume a scan |
+| C | Lift the subject (full photo view) |
 
 ## What has and hasn't been verified
 
 **Verified on the development Mac (macOS 27, Apple M5):**
-- Builds with Xcode 27.2; `swift test` runs 31 tests, all passing. They cover search (All / Any / Only them),
+- Builds with Xcode 27.2; `swift test` runs 56 tests, all passing. They cover search (All / Any / Only them),
   uncertain matches, merge/forget, exports never overwriting, Private Space encryption at rest, routing of a private
-  person's future matches, password change, slideshow style rules and favourites.
+  person's future matches, password change, slideshow style rules, favourites, zoom and swipe behaviour, Quick Pick,
+  Through Time frame choice and video, memories, GPS reading and map grouping.
+- Swipes, pinches, keys and clicks were replayed through the running app in the testing build, with frame timing
+  measured, on a copy of a real 2,058-photo library.
 - **Deleting Private Space never touches source photos:** a test writes real files to a pretend memory card, makes
   photos and a person private, deletes Private Space while locked, and checks every file on the card is byte-for-byte
   identical with the same modification date, no file was added, removed or renamed, the regular library and its
@@ -339,6 +398,7 @@ on film (`▸0012 IMG_4821.CR3`).
 - Clicking through every control by hand (screens were driven with launch-time test hooks), including full-screen
   slideshow playback on every display setup.
 - Libraries of tens of thousands of photos.
+- Gestures by hand on a physical trackpad, the feel of trackpad taps, and dragging a lifted subject into other apps.
 - Notarisation: the downloadable app is signed with a self-signed certificate, not notarised by Apple.
 
 ## Roadmap

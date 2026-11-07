@@ -217,6 +217,7 @@ public final class LibraryStore: @unchecked Sendable {
                             metadata.width, metadata.height, metadata.takenAt, metadata.camera, metadata.lens, metadata.rating,
                             state, error, embeddedID(embedderID, error), importID, Date()])
             }
+            try c.run("INSERT OR REPLACE INTO photo_places(photo_id, lat, lon) VALUES(?,?,?)", photoID, metadata.latitude, metadata.longitude)
             let now = Date()
             for f in faces {
                 try c.run("""

@@ -10,12 +10,22 @@ struct AutoSlideshow: Identifiable, Equatable {
     let span: String?
 }
 
-/// "Slideshows for you": up to four cards, one per person you photograph most, each quietly cycling through that
-/// person's best photos. Nothing to choose: click a card and it plays full screen.
+/// "Slideshows for you": one row of cards, one per person you photograph most, each quietly cycling through that
+/// person's best photos. A wider window fits more people rather than leaving gaps. Nothing to choose: click a card
+/// and it plays full screen.
 struct AutoSlideshows: View {
     @Environment(AppModel.self) private var model
     @State private var shows: [AutoSlideshow] = []
     @State private var loaded = false
+    @State private var width: CGFloat = 1052
+    private static let cardWidth: CGFloat = 225, gap: CGFloat = 18, mostCards = 8
+
+    private var fit: Int { max(1, Int((width + Self.gap) / (Self.cardWidth + Self.gap))) }
+    /// As many cards as fit. They share the row exactly, so it reaches both edges; with too few people to fill it they
+    /// keep a sensible size from the left rather than stretching.
+    private var columns: [GridItem] {
+        Array(repeating: shows.count < fit ? GridItem(.fixed(300), spacing: Self.gap) : GridItem(.flexible(), spacing: Self.gap), count: min(shows.count, fit))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -35,13 +45,16 @@ struct AutoSlideshows: View {
                         .background(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Palette.rule, style: StrokeStyle(lineWidth: 1, dash: [5, 4])))
                 }
             } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 220, maximum: 340), spacing: 18)], spacing: 18) {
-                    ForEach(Array(shows.enumerated()), id: \.element.id) { i, show in
+                LazyVGrid(columns: columns, spacing: Self.gap) {
+                    ForEach(Array(shows.prefix(fit).enumerated()), id: \.element.id) { i, show in
                         SlideshowCard(show: show, stagger: Double(i) * 0.9) { play(show) }
                     }
                 }
+                .frame(width: shows.count < fit ? CGFloat(shows.count) * (300 + Self.gap) - Self.gap : nil)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
         .task(id: "\(model.people.count)-\(model.stats.photos)-\(model.stats.namedPeople)") { await load() }
     }
 
@@ -56,7 +69,7 @@ struct AutoSlideshows: View {
     /// a different selection each day when there are plenty to choose from, played in the order taken.
     private func load() async {
         let store = model.store
-        let people = model.namedPeople.filter { $0.photoCount >= 3 }.sorted { $0.photoCount > $1.photoCount }.prefix(4)
+        let people = model.namedPeople.filter { $0.photoCount >= 3 }.sorted { $0.photoCount > $1.photoCount }.prefix(Self.mostCards)
         let day = Calendar.current.ordinality(of: .day, in: .era, for: Date()) ?? 0
         let input = people.map { ($0.id, $0.displayName) }
         shows = await Task.detached(priority: .utility) { () -> [AutoSlideshow] in
@@ -131,13 +144,15 @@ private struct SlideshowCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             }
             .aspectRatio(4 / 5, contentMode: .fit)
-            .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(.white.opacity(hover ? 0.35 : 0.08)))
-            .shadow(color: .black.opacity(hover ? 0.35 : 0.18), radius: hover ? 18 : 10, y: hover ? 10 : 5)
+                        .shadow(color: .black.opacity(hover ? 0.35 : 0.18), radius: hover ? 18 : 10, y: hover ? 10 : 5)
             .scaleEffect(hover ? 1.025 : 1)
             .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
         .buttonStyle(.plain)
         .onHover { h in withAnimation(.easeOut(duration: 0.2)) { hover = h } }
+        #if PIXORA_UI_TESTING
+        .onAppear { if ProcessInfo.processInfo.environment["PIXORA_TEST_HOVER"] != nil { hover = true } }
+        #endif
         .animation(.easeInOut(duration: reduceMotion ? 1.6 : 1.1), value: index)
         .task(id: show.photos.map(\.id)) { await cycle() }
         .accessibilityLabel("\(show.name) slideshow, \(show.photos.count) photos")

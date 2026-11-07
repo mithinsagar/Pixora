@@ -6,7 +6,14 @@ extension AppModel {
     var isPrivateUnlocked: Bool { privateContent != nil }
     /// Photos and people can be made private once Private Space exists — locked or not (new items are
     /// encrypted to its public key).
-    var canMakePrivate: Bool { vault.isSetUp }
+    /// Asked by every photo tile as it scrolls past, and answering means a Keychain lookup, so it's remembered until
+    /// Private Space is created or erased.
+    var canMakePrivate: Bool {
+        if let known = vaultSetUpCache, known.epoch == vaultEpoch { return known.isSetUp }
+        let isSetUp = vault.isSetUp
+        vaultSetUpCache = (vaultEpoch, isSetUp)
+        return isSetUp
+    }
 
     func toggleFavorite(_ photos: [Photo]) {
         let ids = photos.map(\.id).filter { $0 > 0 }

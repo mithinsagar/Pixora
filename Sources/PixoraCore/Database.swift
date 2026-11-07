@@ -240,6 +240,9 @@ enum Schema {
         """)
         // v4 — favorites (slideshows).
         try c.exec("CREATE TABLE IF NOT EXISTS favorites(photo_id INTEGER PRIMARY KEY REFERENCES photos(id) ON DELETE CASCADE, added_at REAL NOT NULL)")
+        // v5 — where photos were taken. Its own table, so a photo made private takes its location with it. A row
+        // with no position means the photo was checked and has no GPS tag.
+        try c.exec("CREATE TABLE IF NOT EXISTS photo_places(photo_id INTEGER PRIMARY KEY REFERENCES photos(id) ON DELETE CASCADE, lat REAL, lon REAL)")
     }
 
     private static func addColumn(_ c: Connection, _ table: String, _ column: String, _ decl: String) throws {

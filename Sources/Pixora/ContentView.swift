@@ -16,12 +16,16 @@ struct ContentView: View {
                 case .review: ReviewView()
                 case .people: PeopleView()
                 case .allPhotos: AllPhotosView()
+                case .places: PlacesView()
                 case .insights: InsightsView()
                 case .settings: SettingsScreen()
                 case .privateSpace: PrivateSpaceView()
                 case .importer: ImportView()
                 }
             }
+            .id(model.section)
+            .transition(.opacity)
+            .animation(.easeOut(duration: 0.18), value: model.section)
             .overlay(alignment: .top) { cardBanner }
             .inspector(isPresented: Binding(get: { model.showInspector && [.find, .allPhotos].contains(model.section) },
                                             set: { model.showInspector = $0 })) {
@@ -45,9 +49,20 @@ struct ContentView: View {
         }
         .animation(.easeOut(duration: 0.15), value: model.showCommandBar)
         .overlay(alignment: .bottom) { ToastView(undoManager: undoManager).padding(.bottom, 84) }
-        .overlay { if model.viewer != nil { PhotoViewer().id(model.viewer?.id) } }
+        .overlay { if let r = model.quickPick { QuickPickView(request: r).id(r.id).ignoresSafeArea().transition(.opacity) } }
+        .overlay { if let r = model.faceTime { FaceTimeView(request: r).id(r.id).ignoresSafeArea().transition(.opacity) } }
+        .overlay { if model.viewer != nil { PhotoViewer().id(model.viewer?.id).ignoresSafeArea() } }
         .overlay { if let s = model.slideshow { SlideshowPlayer(request: s).id(s.id).transition(.opacity) } }
-        .onAppear { model.undoManager = undoManager }
+        .animation(.easeOut(duration: 0.22), value: model.quickPick?.id)
+        .animation(.easeOut(duration: 0.28), value: model.faceTime?.id)
+        .onChange(of: model.isImmersive) { _, on in setWindowChrome(hidden: on) }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didEnterFullScreenNotification)) { _ in setWindowChrome(hidden: model.isImmersive) }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didExitFullScreenNotification)) { _ in setWindowChrome(hidden: model.isImmersive) }
+        .onAppear {
+            model.undoManager = undoManager
+            TileDragger.shared.start(model: model)
+            if model.isImmersive { DispatchQueue.main.async { setWindowChrome(hidden: true) } }
+        }
         .onChange(of: undoManager) { model.undoManager = undoManager }
         .alert("Something went wrong", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
             Button("OK") { model.errorMessage = nil }
@@ -56,6 +71,17 @@ struct ContentView: View {
 }
 
 extension ContentView {
+    /// Photos get the whole window. The title bar is hidden rather than the toolbar removed: taking the toolbar away
+    /// would move the page underneath, and the photo has to shrink back into its tile exactly where it left.
+    func setWindowChrome(hidden: Bool) {
+        guard let w = NSApp.windows.first(where: { $0.isVisible && $0.frame.width > 400 }),
+              let bar = w.standardWindowButton(.closeButton)?.superview?.superview else { return }
+        bar.isHidden = hidden
+        // In full screen the title bar lives in its own window over the top of the screen. Hiding what's in it isn't
+        // enough: the window itself would still take the clicks meant for the buttons underneath.
+        bar.window?.ignoresMouseEvents = hidden && bar.window !== w
+    }
+
     @ViewBuilder var cardBanner: some View {
         if let prompt = model.cardPrompt {
             HStack(spacing: 12) {
@@ -94,6 +120,7 @@ private struct Sidebar: View {
                         .tag(SidebarItem.review)
                     Label("People", systemImage: "person.crop.rectangle.stack").tag(SidebarItem.people)
                     Label("All Photos", systemImage: "photo.on.rectangle").tag(SidebarItem.allPhotos)
+                    Label("Places", systemImage: "map").tag(SidebarItem.places)
                     Label("Insights", systemImage: "point.3.connected.trianglepath.dotted").tag(SidebarItem.insights)
                     // No counts that would reveal anything. Signed out, it explains and offers sign-in.
                     Label("Private Space", systemImage: model.isPrivateUnlocked ? "lock.open" : "lock").tag(SidebarItem.privateSpace)

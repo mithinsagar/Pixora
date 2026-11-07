@@ -76,6 +76,7 @@ struct PeopleView: View {
             Button("Open") { model.openPersonID = p.id }
             Button("Find Photos") { model.selectedPeople = [p.id]; model.section = .find }
             Button("Solo Photos Only") { model.selectedPeople = [p.id]; model.matchMode = .only; model.section = .find }
+            Button("Through Time") { model.faceTime = FaceTimeRequest(personID: p.id, name: p.displayName) }
             Button("Export All Photos…") { model.exportEveryone = ExportEveryoneRequest(preselected: [p.id]) }
             Button(p.id == model.mePersonID ? "This Isn’t Me" : "This Is Me") { model.setMe(p.id == model.mePersonID ? nil : p.id) }
             Button(selected ? "Deselect" : "Select") { selection.formSymmetricDifference([p.id]) }
@@ -133,6 +134,9 @@ struct PersonDetailView: View {
                     EdgeLabel("\(Format.count(person.photoCount, "photo")) · \(Format.count(person.faceCount, "face"))\(person.lastSeen.map { " · last seen " + Format.day.string(from: $0) } ?? "")")
                 }
                 Spacer()
+                Button { model.faceTime = FaceTimeRequest(personID: person.id, name: person.displayName) } label: {
+                    Label("Through Time", systemImage: "clock.arrow.circlepath")
+                }.help("Watch \(person.displayName) change over time, with every photo lined up on the eyes")
                 Button("Solo Photos") { model.selectedPeople = [person.id]; model.matchMode = .only; model.section = .find }
                     .help("Photos with nobody else in them")
                 Button("Find Photos") { model.selectedPeople = [person.id]; model.matchMode = .all; model.section = .find }
@@ -336,6 +340,13 @@ struct PersonPhotosView: View {
                     .help("Off: every frame is shown. On: frames shot within 2 s are stacked behind the best one.")
                 Spacer()
                 EdgeLabel(Format.count(results.count, "photo") + (results.count > shown.count ? " · \(results.count - shown.count) burst frames stacked" : ""))
+                Button { model.quickPick = QuickPickRequest(title: person.displayName, photos: shown.map(\.photo)) } label: {
+                    Label("Quick Pick", systemImage: "hand.draw").font(.system(size: 13, weight: .semibold))
+                        .padding(.horizontal, 13).padding(.vertical, 7)
+                        .background(Capsule().fill(Palette.card)).overlay(Capsule().strokeBorder(Palette.rule)).foregroundStyle(Palette.ink)
+                }
+                .buttonStyle(.plain).hoverLift(scale: 1.04, radius: 16).disabled(shown.isEmpty)
+                .help("Go through these one at a time: keep, favorite or skip")
                 SelectToggle(selecting: $selecting)
             }
             .padding(.horizontal, 24).padding(.vertical, 12)
@@ -358,6 +369,12 @@ struct PersonPhotosView: View {
                 SelectionBar(selected: shown.map(\.photo).filter { selected.contains($0.id) }, total: shown.count, person: person,
                              title: person.displayName,
                              selectAll: { selected = Set(shown.map(\.id)) }, selectNone: { selected = [] },
+                             selectFavorites: !results.contains { model.favorites.contains($0.id) } ? nil : {
+                                 // A favorite stacked in a burst has to be showing to be copied.
+                                 let chosen = results.filter { model.favorites.contains($0.id) }
+                                 expanded.formUnion(chosen.compactMap(\.burstID))
+                                 selected = Set(chosen.map(\.id))
+                             },
                              done: { selecting = false; selected = [] })
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }

@@ -381,6 +381,7 @@ private struct GridPage: View {
     @Environment(AppModel.self) private var model
     @AppStorage("tileSize") private var tileSize: Double = 190
     @AppStorage("defaultIncludeUncertain") private var defaultUncertain = false
+    @AppStorage("viewerGlow") private var viewerGlow = true
 
     var body: some View {
         @Bindable var themes = ThemeManager.shared
@@ -406,6 +407,9 @@ private struct GridPage: View {
                 SettingRow(title: "Faces of the people in it") { Toggle("", isOn: $themes.showFaceBadges).labelsHidden().toggleStyle(.switch) }
                 SettingRow(title: "Quality badges", detail: "★ Best, Burst 2/4, Eyes, Soft.") { Toggle("", isOn: $themes.showQualityBadges).labelsHidden().toggleStyle(.switch) }
                 SettingRow(title: "Hover effects", detail: "Lift, glow and quick actions when the pointer is over a photo or face.") { Toggle("", isOn: $themes.hoverEffects).labelsHidden().toggleStyle(.switch) }
+            }
+            SettingsGroup(title: "Full photo view") {
+                SettingRow(title: "Colour glow", detail: "The background softly takes on the colours of the photo.") { Toggle("", isOn: $viewerGlow).labelsHidden().toggleStyle(.switch) }
             }
             SettingsGroup(title: "Find results") {
                 SettingRow(title: "Stack bursts behind the best frame", detail: "Off shows every frame.") { Toggle("", isOn: $model.stackBursts).labelsHidden().toggleStyle(.switch) }

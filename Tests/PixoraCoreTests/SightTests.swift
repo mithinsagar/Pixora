@@ -183,7 +183,8 @@ final class SightTests: XCTestCase {
     /// Searching while the deep scan runs: this aborted the app until the models took turns.
     func testSearchingDuringADeepScanIsSafe() async throws {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["PIXORA_SIGHT_REFS"] else { throw XCTSkip("needs the installed model") }
+        guard let path = env["PIXORA_SIGHT_REFS"], let home = env["PIXORA_SIGHT_HOME"] else { throw XCTSkip("needs the installed model") }
+        setenv("PIXORA_HOME", home, 1)   // other tests move it
         let base = URL(fileURLWithPath: path).deletingLastPathComponent()
         let refs = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: path))) as! [String: Any]
         let file = (refs["images"] as! [[String: Any]])[0]["file"] as! String
@@ -204,7 +205,9 @@ final class SightTests: XCTestCase {
 
     /// The real model, run the way the app runs it, against the numbers the accuracy tests were measured on.
     func testSwiftSeesWhatTheMeasuredModelSaw() throws {
-        guard let path = ProcessInfo.processInfo.environment["PIXORA_SIGHT_REFS"] else { throw XCTSkip("needs the installed model and reference numbers") }
+        let env = ProcessInfo.processInfo.environment
+        guard let path = env["PIXORA_SIGHT_REFS"], let home = env["PIXORA_SIGHT_HOME"] else { throw XCTSkip("needs the installed model and reference numbers") }
+        setenv("PIXORA_HOME", home, 1)   // other tests move it
         let base = URL(fileURLWithPath: path).deletingLastPathComponent()
         let refs = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: path))) as! [String: Any]
         let dot = { (a: [Float], b: [Float]) in zip(a, b).reduce(Float(0)) { $0 + $1.0 * $1.1 } }

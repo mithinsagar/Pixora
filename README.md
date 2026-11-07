@@ -395,6 +395,7 @@ The one-word gap is within chance; PE-Core's lead on descriptions is real. SigLI
 - **A search for something absent can still show wrong photos.** At the *Best* level, about a quarter of absent things showed at least one.
 - **Other languages vary.** Hindi, Tamil, Japanese and Spanish ranked cats correctly (10 of 10), but scores run lower, so fewer photos pass the cut-offs. Malayalam did not work (0 of 10 for cat).
 - It reads the 640 px previews, so tiny details and small text are out of reach.
+- A search describes the whole photo, not one person in it, so "asha sunglasses" can show Asha next to someone else in sunglasses.
 
 ## Places
 
@@ -420,7 +421,7 @@ Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scrol
 ## What has and hasn't been verified
 
 **Verified on the development Mac (macOS 27, Apple M5):**
-- Builds with Xcode 27.2; `swift test` runs 56 tests, all passing. They cover search (All / Any / Only them),
+- Builds with Xcode 27.2; `swift test` runs 71 tests, all passing (4 need a sample portrait or the search model, and skip without them). They cover search (All / Any / Only them),
   uncertain matches, merge/forget, exports never overwriting, Private Space encryption at rest, routing of a private
   person's future matches, password change, slideshow style rules, favourites, zoom and swipe behaviour, Quick Pick,
   Through Time frame choice and video, memories, GPS reading and map grouping.
@@ -431,6 +432,7 @@ Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scrol
   identical with the same modification date, no file was added, removed or renamed, the regular library and its
   people are unchanged, and the old password no longer opens anything.
 - An end-to-end run (`pixora-eval --e2e`) on a test card built from LFW faces (grouping, search, export, rescan).
+- **Search:** the model was downloaded through the app from a local test server, checked, installed and used to deep scan a copy of a real 2,058-photo library (none unreadable, 1.6 to 1.8 seconds a photo). Results for searches like "a woman in a saree", "stairs" and "group of people" were checked by eye. A deep scan survived a forced quit and carried on. The tokenizer matches the model's own on 14 phrases in 7 scripts, and photo vectors agree with the measured model to 99.4% or better.
 - Screens checked by screenshot: Find Photos with Slideshow Studio, Private Space setup, locked and unlocked views.
 
 **Not yet verified:**
@@ -439,6 +441,8 @@ Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scrol
   slideshow playback on every display setup.
 - Libraries of tens of thousands of photos.
 - Gestures by hand on a physical trackpad, the feel of trackpad taps, and dragging a lifted subject into other apps.
+- Downloading the search model from GitHub itself, or on a slow connection. Macs other than an M5, which will be slower.
+- Opening a photo from Search results by hand. It uses the same grid as a person's page.
 - Notarisation: the downloadable app is signed with a self-signed certificate, not notarised by Apple.
 
 ## Roadmap

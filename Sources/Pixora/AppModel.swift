@@ -205,6 +205,7 @@ final class AppModel {
         }
         #if PIXORA_UI_TESTING
         switch env["PIXORA_TEST_OPEN"] {
+        case "scan": if let source = sources.first { rescan(source) }
         case "quickpick": quickPick = QuickPickRequest(title: querySentence, photos: visibleResults.map(\.photo))
         case "facetime":
             if let id = selectedPeople.first, let p = person(id) { faceTime = FaceTimeRequest(personID: id, name: p.displayName) }

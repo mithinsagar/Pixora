@@ -30,9 +30,12 @@ struct ReviewView: View {
         }
         .background(Palette.canvas)
         .task(id: "\(model.people.count)-\(model.stats.reviewItems)-\(model.stats.faces)-\(model.isMatching)") {
-            uncertain = (try? model.store.uncertainFaces()) ?? []
-            unsorted = (try? model.store.unsortedFaces()) ?? []
-            unrecognizable = (try? model.store.unrecognizableFaceCount()) ?? 0
+            // Off the main thread: run on it, these queries froze the page as it slid in.
+            let store = model.store
+            let (u, s, n) = await Task.detached(priority: .userInitiated) {
+                ((try? store.uncertainFaces()) ?? [], (try? store.unsortedFaces()) ?? [], (try? store.unrecognizableFaceCount()) ?? 0)
+            }.value
+            uncertain = u; unsorted = s; unrecognizable = n
         }
     }
 }
@@ -71,7 +74,8 @@ private struct GroupCard: View {
                     .buttonStyle(.plain).foregroundStyle(Palette.ink2).underline().help("For strangers in the background. Their faces are removed from review and face templates are deleted.")
             }
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                // Lazy: only the faces in view are made, which kept the page from stalling as it slid in.
+                LazyHStack(spacing: 8) {
                     ForEach(faces.prefix(30)) { f in
                         FaceImage(faceID: f.id, size: 76)
                             .opacity(excluded.contains(f.id) ? 0.3 : 1)
@@ -98,7 +102,10 @@ private struct GroupCard: View {
             }
         }
         .padding(16).cardBackground()
-        .task(id: group.faceCount) { faces = (try? model.store.faces(personID: group.id)) ?? [] }
+        .task(id: group.faceCount) {
+            let store = model.store, id = group.id
+            faces = await Task.detached(priority: .userInitiated) { (try? store.faces(personID: id)) ?? [] }.value
+        }
         .alert("Merge with existing \(confirmMerge?.displayName ?? "")?", isPresented: .constant(confirmMerge != nil), presenting: confirmMerge) { p in
             Button("Merge") { commit(); confirmMerge = nil }
             Button("Cancel", role: .cancel) { confirmMerge = nil }

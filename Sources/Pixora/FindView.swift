@@ -68,8 +68,10 @@ struct FindView: View {
         .background(Palette.canvas)
         .sheet(isPresented: $showStudio) { SlideshowStudioSheet(source: .library) }
         .task {
-            cameras = (try? model.store.distinctValues("camera")) ?? []
-            lenses = (try? model.store.distinctValues("lens")) ?? []
+            let store = model.store
+            (cameras, lenses) = await Task.detached(priority: .userInitiated) {
+                ((try? store.distinctValues("camera")) ?? [], (try? store.distinctValues("lens")) ?? [])
+            }.value
         }
     }
 

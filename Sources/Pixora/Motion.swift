@@ -9,6 +9,8 @@ enum Motion {
     /// Things landing: a little life, for hearts, cards and badges.
     static let pop = Animation.spring(response: 0.32, dampingFraction: 0.62)
     static let quick = Animation.easeOut(duration: 0.16)
+    /// Changing page: quick to arrive, no bounce.
+    static let page = Animation.spring(response: 0.3, dampingFraction: 0.9)
 }
 
 /// A light tap from the trackpad at the moment something clicks into place. Only Force Touch trackpads can do this;

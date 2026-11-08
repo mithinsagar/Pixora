@@ -4,7 +4,7 @@ import CoreGraphics
 
 /// Testing build only: plays a script of real input through the app's window, the same route events from the trackpad
 /// take, and reports how smoothly it drew. Steps separated by ";":
-/// wait S · swipe DX DY [SECONDS] · pinch FACTOR · key NAME · click X Y · hold X Y · shot NAME · say TEXT · scroll DY · quit
+/// wait S · section NAME · swipe DX DY [SECONDS] · pinch FACTOR · key NAME · click X Y · hold X Y · shot NAME · say TEXT · scroll DY · quit
 @MainActor
 final class Rehearsal: NSObject {
     private static var current: Rehearsal?
@@ -46,6 +46,7 @@ final class Rehearsal: NSObject {
             case "swipe": await swipe(dx: n[0], dy: n[1], seconds: n.count > 2 ? n[2] : 0.28)
             case "scroll": await pageScroll(dy: n[0])
             case "queue": viaQueue = true
+            case "section": goTo(step[1])
             case "fullscreen": window?.toggleFullScreen(nil); try? await Task.sleep(for: .seconds(3))
             case "windows": windows()
             case "resize":
@@ -163,6 +164,13 @@ final class Rehearsal: NSObject {
         }
         try? await Task.sleep(for: .milliseconds(300))
         stopMeasuring("pinch \(factor)")
+    }
+
+    /// Changes page the way the sidebar does: no animation asked for by the caller.
+    private func goTo(_ name: String) {
+        let pages: [String: SidebarItem] = ["find": .find, "search": .search, "review": .review, "people": .people, "all": .allPhotos,
+                                            "places": .places, "insights": .insights, "import": .importer, "settings": .settings]
+        if let page = pages[name] { model.section = page } else { log("unknown section \(name)") }
     }
 
     private func key(_ name: String) {

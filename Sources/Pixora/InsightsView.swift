@@ -61,6 +61,7 @@ private struct TogetherMap: View {
     @State private var hoveredNode: Int64?
     @State private var hoveredEdge: TogetherEdge?
     @State private var dragging: Int64?
+    @State private var shown = false
 
     var body: some View {
         GeometryReader { geo in
@@ -122,7 +123,13 @@ private struct TogetherMap: View {
             }
         }
         .padding(24)
-        .task(id: "\(range)-\(model.people.count)-\(model.stats.faces)") { load() }
+        .opacity(shown ? 1 : 0)
+        .task(id: "\(range)-\(model.people.count)-\(model.stats.faces)") {
+            // Drawing a few hundred connections takes a moment, so let the page finish arriving first, then fade the map in.
+            if !shown { try? await Task.sleep(for: .milliseconds(280)) }
+            await load()
+            withAnimation(Motion.quick) { shown = true }
+        }
     }
 
     private func name(_ id: Int64) -> String { model.person(id)?.displayName ?? "?" }
@@ -133,14 +140,19 @@ private struct TogetherMap: View {
         model.selectedPeople = [e.a, e.b]; model.matchMode = .all; model.section = .find
     }
 
-    private func load() {
+    /// Off the main thread, so the page can slide in while the map is worked out.
+    private func load() async {
         let (from, to) = range.interval(model)
-        edges = (try? model.store.togetherEdges(from: from, to: to)) ?? []
-        positions = Self.layout(people: model.namedPeople.map(\.id), edges: edges)
+        let store = model.store, people = model.namedPeople.map(\.id)
+        let (e, p) = await Task.detached(priority: .userInitiated) {
+            let e = (try? store.togetherEdges(from: from, to: to)) ?? []
+            return (e, Self.layout(people: people, edges: e))
+        }.value
+        edges = e; positions = p
     }
 
     /// A small deterministic force layout in unit space: connected people attract, everyone repels.
-    static func layout(people: [Int64], edges: [TogetherEdge]) -> [Int64: CGPoint] {
+    nonisolated static func layout(people: [Int64], edges: [TogetherEdge]) -> [Int64: CGPoint] {
         guard !people.isEmpty else { return [:] }
         var pos: [Int64: CGPoint] = [:]
         for (i, id) in people.enumerated() {
@@ -230,7 +242,8 @@ private struct CoverageView: View {
         }
         .task(id: "\(range)-\(model.people.count)-\(model.stats.faces)") {
             let (from, to) = range.interval(model)
-            rows = (try? model.store.coverage(from: from, to: to)) ?? []
+            let store = model.store
+            rows = await Task.detached(priority: .userInitiated) { (try? store.coverage(from: from, to: to)) ?? [] }.value
         }
     }
 }

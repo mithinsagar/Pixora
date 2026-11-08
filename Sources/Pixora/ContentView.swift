@@ -4,29 +4,20 @@ import PixoraCore
 struct ContentView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         @Bindable var model = model
         return NavigationSplitView {
             Sidebar().navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 300)
         } detail: {
-            Group {
-                switch model.section {
-                case .find: FindView()
-                case .search: SearchView()
-                case .review: ReviewView()
-                case .people: PeopleView()
-                case .allPhotos: AllPhotosView()
-                case .places: PlacesView()
-                case .insights: InsightsView()
-                case .settings: SettingsScreen()
-                case .privateSpace: PrivateSpaceView()
-                case .importer: ImportView()
-                }
+            // The animation sits on a container that stays put. On the page itself it was thrown away with the old page,
+            // so switching was an instant cut.
+            ZStack {
+                page.id(model.section).transition(pageTransition)
             }
-            .id(model.section)
-            .transition(.opacity)
-            .animation(.easeOut(duration: 0.18), value: model.section)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .animation(reduceMotion ? Motion.quick : Motion.page, value: model.section)
             .overlay(alignment: .top) { cardBanner }
             .inspector(isPresented: Binding(get: { model.showInspector && [.find, .allPhotos].contains(model.section) },
                                             set: { model.showInspector = $0 })) {
@@ -73,6 +64,30 @@ struct ContentView: View {
 }
 
 extension ContentView {
+    @ViewBuilder var page: some View {
+        switch model.section {
+        case .find: FindView()
+        case .search: SearchView()
+        case .review: ReviewView()
+        case .people: PeopleView()
+        case .allPhotos: AllPhotosView()
+        case .places: PlacesView()
+        case .insights: InsightsView()
+        case .settings: SettingsScreen()
+        case .privateSpace: PrivateSpaceView()
+        case .importer: ImportView()
+        }
+    }
+
+    /// The new page rises in from the side of the sidebar you moved towards. The old one goes at once: fading it out
+    /// as well laid two pages over each other and looked muddy. No scaling: pages with text fields (Review) dropped to
+    /// about 20 fps while scaled, and held 60 without it.
+    var pageTransition: AnyTransition {
+        guard !reduceMotion else { return .opacity }
+        let arrive = AnyTransition.opacity.combined(with: .offset(y: 16 * model.sectionStep))
+        return .asymmetric(insertion: arrive, removal: .identity)
+    }
+
     /// Photos get the whole window. The title bar is hidden rather than the toolbar removed: taking the toolbar away
     /// would move the page underneath, and the photo has to shrink back into its tile exactly where it left.
     func setWindowChrome(hidden: Bool) {

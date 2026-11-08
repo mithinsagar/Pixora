@@ -10,6 +10,8 @@ struct AllPhotosView: View {
     @State private var failed: [Photo] = []
     @State private var selecting = false
     @State private var selected: Set<Int64> = []
+    /// Until the first load lands, show nothing rather than a flash of "No photos yet".
+    @State private var loaded = false
 
     var body: some View {
         @Bindable var model = model
@@ -35,7 +37,9 @@ struct AllPhotosView: View {
                        actions: [("Copy List", { copyFailed() })])
                     .padding(.horizontal, 24).padding(.top, 12)
             }
-            if photos.isEmpty {
+            if !loaded {
+                Spacer()
+            } else if photos.isEmpty {
                 EmptyState(symbol: "photo.stack", title: filter.isEmpty ? "No photos yet" : "Nothing matches these filters",
                            message: filter.isEmpty ? "Scan a card or folder to fill your library." : "Try clearing a filter.")
             } else {
@@ -55,10 +59,15 @@ struct AllPhotosView: View {
         }
         .background(Palette.canvas)
         .task(id: "\(model.stats.scanned)-\(model.stats.faces)") {
-            cameras = (try? model.store.distinctValues("camera")) ?? []
-            lenses = (try? model.store.distinctValues("lens")) ?? []
-            failed = (try? model.store.failedPhotos()) ?? []
-            reload()
+            // Off the main thread, so the page can slide in while 2,000 photos are read.
+            let store = model.store, chosen = filter
+            let (c, l, f, p) = await Task.detached(priority: .userInitiated) {
+                ((try? store.distinctValues("camera")) ?? [], (try? store.distinctValues("lens")) ?? [],
+                 (try? store.failedPhotos()) ?? [], (try? store.photos(filter: chosen)) ?? [])
+            }.value
+            cameras = c; lenses = l; failed = f
+            if filter == chosen { photos = p }
+            loaded = true
         }
         .onChange(of: filter) { reload() }
     }

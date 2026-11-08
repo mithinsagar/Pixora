@@ -4,6 +4,9 @@ import PixoraCore
 
 enum SidebarItem: Hashable {
     case find, search, review, people, allPhotos, places, insights, importer, settings, privateSpace
+
+    /// Top to bottom, as the sidebar lists them.
+    var order: Int { [.find, .search, .review, .people, .allPhotos, .places, .insights, .privateSpace, .importer, .settings].firstIndex(of: self) ?? 0 }
 }
 
 /// Find results arranged for display: strong shots first, weaker ones (eyes closed, soft, extra burst frames)
@@ -60,8 +63,13 @@ final class AppModel {
     var isBasicMode: Bool { embedder is VisionFeaturePrintEmbedder }
 
     var section: SidebarItem = .find {
-        didSet { if oldValue == .privateSpace && section != .privateSpace && UserDefaults.standard.object(forKey: "lockOnLeave") as? Bool ?? true { lockPrivateSpace() } }
+        didSet {
+            if section != oldValue { sectionStep = section.order >= oldValue.order ? 1 : -1 }
+            if oldValue == .privateSpace && section != .privateSpace && UserDefaults.standard.object(forKey: "lockOnLeave") as? Bool ?? true { lockPrivateSpace() }
+        }
     }
+    /// Which way the last page change went down the sidebar (1) or up it (-1), so the new page arrives from that side.
+    @ObservationIgnored var sectionStep: CGFloat = 1
     var people: [Person] = []
     var sources: [Source] = []
     var volumes: [VolumeInfo] = []

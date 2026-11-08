@@ -57,6 +57,18 @@ public enum EmbedderError: Error, LocalizedError {
 
 /// A Core ML face-embedding model: ArcFace R50 (default) or FaceNet, converted by the scripts in tools/.
 /// Runs on-device on the Neural Engine / GPU; no data leaves the Mac.
+extension MLModel {
+    /// Neural Engine and GPU on real hardware. The iOS Simulator emulates the GPU and returned all-zero face
+    /// templates from ArcFace there, so simulator builds run the models on the CPU.
+    static var faceComputeUnits: MLComputeUnits {
+        #if targetEnvironment(simulator)
+        return .cpuOnly
+        #else
+        return .all
+        #endif
+    }
+}
+
 public final class CoreMLFaceEmbedder: FaceEmbedder {
     public let id: String
     public let displayName: String
@@ -74,7 +86,7 @@ public final class CoreMLFaceEmbedder: FaceEmbedder {
     public init(compiledModelURL: URL) throws {
         modelURL = compiledModelURL
         let config = MLModelConfiguration()
-        config.computeUnits = .all
+        config.computeUnits = MLModel.faceComputeUnits
         model = try MLModel(contentsOf: compiledModelURL, configuration: config)
         let desc = model.modelDescription
         guard let input = desc.inputDescriptionsByName.values.first(where: { $0.type == .image }),
@@ -108,6 +120,9 @@ public final class CoreMLFaceEmbedder: FaceEmbedder {
         guard let array = out.featureValue(for: outputName)?.multiArrayValue else { throw EmbedderError.badOutput }
         var v = [Float](repeating: 0, count: array.count)
         for i in 0..<array.count { v[i] = array[i].floatValue }
+        // A broken run (seen in the iOS Simulator's GPU emulation) returns all zeros. Storing that would make
+        // every face look identical to matching, so treat it as "no template" instead.
+        guard v.contains(where: { $0 != 0 && $0.isFinite }) else { throw EmbedderError.badOutput }
         return Vector.normalized(v)
     }
 
@@ -206,7 +221,7 @@ public final class SCRFDDetector: FaceDetector {
 
     public init(compiledModelURL: URL) throws {
         let config = MLModelConfiguration()
-        config.computeUnits = .all
+        config.computeUnits = MLModel.faceComputeUnits
         model = try MLModel(contentsOf: compiledModelURL, configuration: config)
         guard let c = model.modelDescription.inputDescriptionsByName["image"]?.imageConstraint else { throw EmbedderError.badOutput }
         constraint = c

@@ -316,12 +316,17 @@ public final class SightInstaller: NSObject, URLSessionDownloadDelegate, @unchec
     }
 
     private static func unzip(_ zip: URL, into folder: URL) throws {
+        #if os(macOS)
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
         process.arguments = ["-x", "-k", zip.path, folder.path]
         try process.run()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else { throw SightInstallError.damaged(zip.lastPathComponent) }
+        #else
+        // Search by content is a Mac feature for now: the model is 1.7 GB and needs ditto to unpack.
+        throw SightInstallError.damaged(zip.lastPathComponent)
+        #endif
     }
 
     private func finish(_ result: Result<URL, Error>) {

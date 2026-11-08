@@ -3,9 +3,11 @@ import PackageDescription
 
 let package = Package(
     name: "Pixora",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v14), .iOS(.v17)],
     products: [
         .executable(name: "Pixora", targets: ["Pixora"]),
+        // The shared engine, also linked by the iPhone app (iOS/project.yml).
+        .library(name: "PixoraCore", targets: ["PixoraCore"]),
         .executable(name: "pixora-eval", targets: ["PixoraEval"]),
     ],
     targets: [

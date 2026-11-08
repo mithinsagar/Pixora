@@ -295,7 +295,7 @@ public final class ScanEngine: @unchecked Sendable {
         let meta = ImageLoader.metadata(at: url)
         let fingerprint = Fingerprint.quick(url: url, size: file.size)
         guard let image = ImageLoader.image(at: url, maxPixel: analysisLongEdge) else {
-            return record(file, importID, sourceID, meta, fingerprint, [], error: "macOS could not decode this image.")
+            return record(file, importID, sourceID, meta, fingerprint, [], error: "This image could not be decoded.")
         }
         let faces: [DetectedFace]
         do {

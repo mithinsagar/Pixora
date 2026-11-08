@@ -51,7 +51,7 @@ struct SlideshowStudio: View {
     @State private var musicFile: URL?
     @State private var listening = false
     @AppStorage("slideDuration") private var duration = 4.0
-    @AppStorage("slideTransition") private var transitionRaw = SlideTransition.crossfade.rawValue
+    @AppStorage("slideTransition") private var transitionRaw = SlideshowTransition.crossfade.rawValue
     @AppStorage("slideCaptions") private var showCaptions = true
     @AppStorage("slideVolume") private var volume = 0.35
 
@@ -272,7 +272,7 @@ struct SlideshowStudio: View {
                 }
                 Text("Transition").foregroundStyle(c.ink2)
                 Picker("", selection: $transitionRaw) {
-                    ForEach(SlideTransition.allCases) { Text($0.title).tag($0.rawValue) }
+                    ForEach(SlideshowTransition.allCases) { Text($0.title).tag($0.rawValue) }
                 }.labelsHidden().pickerStyle(.segmented).fixedSize()
             }
             GridRow {
@@ -419,7 +419,7 @@ struct SlideshowStudio: View {
         model.slideshow = SlideshowRequest(
             title: title, slides: list.map(\.photo),
             captions: Dictionary(uniqueKeysWithValues: list.map { ($0.id, caption(for: $0)) }),
-            duration: duration, transition: SlideTransition(rawValue: transitionRaw) ?? .crossfade, showCaptions: showCaptions,
+            duration: duration, transition: SlideshowTransition(rawValue: transitionRaw) ?? .crossfade, showCaptions: showCaptions,
             music: musicOn ? (musicFile.map(MusicChoice.file) ?? .ambient) : nil, volume: Float(volume),
             isPrivate: source.isPrivate)
         onPlay()

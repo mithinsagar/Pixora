@@ -111,11 +111,21 @@ public enum Exporter {
             for folder in tops.sorted(by: { $0.path < $1.path }) {
                 let zip = folder.appendingPathExtension("zip")
                 guard !FileManager.default.fileExists(atPath: zip.path) else { report.duplicatesSkipped.append(zip.lastPathComponent); continue }
+                #if os(macOS)
                 let p = Process()
                 p.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
                 p.arguments = ["-c", "-k", "--sequesterRsrc", "--keepParent", folder.path, zip.path]
                 do { try p.run(); p.waitUntilExit() } catch { report.errors.append((zip.lastPathComponent, error.localizedDescription)) }
                 if p.terminationStatus == 0 { report.zips.append(zip) } else { report.errors.append((zip.lastPathComponent, "Could not create zip.")) }
+                #else
+                // iOS has no ditto; the file coordinator hands back a temporary zip of the folder to copy out.
+                var made = false
+                var failure: NSError?
+                NSFileCoordinator().coordinate(readingItemAt: folder, options: .forUploading, error: &failure) { temp in
+                    made = (try? FileManager.default.copyItem(at: temp, to: zip)) != nil
+                }
+                if made { report.zips.append(zip) } else { report.errors.append((zip.lastPathComponent, failure?.localizedDescription ?? "Could not create zip.")) }
+                #endif
             }
         }
         return report

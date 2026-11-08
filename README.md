@@ -418,6 +418,40 @@ Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scrol
 | Space | Pause/resume a scan |
 | C | Lift the subject (full photo view) |
 
+## iPhone
+
+Pixora also runs as a native iPhone app (iOS 17 or later), in `iOS/`. It shares the engine with the Mac app
+(`PixoraCore`: face detection and recognition, matching, the library database, Private Space encryption,
+slideshow suggestions and export), so the same photos give the same people and the same results on both. Only the
+interface is separate, designed for touch: five tabs (Find, People, Library, Review, Private), photo grids in thumb
+reach, swipe yes or no in Review, pinch and swipe in the viewer, and actions in a bar at the bottom of the screen.
+
+**Getting photos in.** From the Photos library (the system picker: Pixora sees only the photos you pick, and keeps
+its own copy so it can work offline; your library isn't changed), from a folder in Files (read where it is), or
+from an SD card reader or USB drive through Files. iOS has no "card inserted" signal for apps and gives access only
+while the card is plugged in, so an unplugged card's photos stay in Pixora as previews marked "not connected", with
+Reconnect in Library. Pixora never writes to a card.
+
+**Copying out.** Save to Files (a folder you choose, including iCloud Drive or a USB drive) with the same options as
+the Mac, or Share. Originals are only read.
+
+**Private Space** works the same way as on the Mac, with its own password, encrypted copies and delete-and-recreate
+for a forgotten password. It locks the moment Pixora leaves the screen or you switch tabs, and the app-switcher
+preview never shows photos. The password file is saved with the Files save sheet, only where you choose.
+
+**Slideshows** use the current Find selection with All or Any, one person, or chosen photos. Music can be turned on
+in the studio, but every slideshow still starts muted until you tap the speaker.
+
+**Offline.** Everything above works without internet. No account, no cloud.
+
+**Not on iPhone yet:** search by what's in a photo (its 1.7 GB model is Mac only for now), Places, Quick Pick,
+Through Time, lifting a subject, contact links and Insights. Mac and iPhone keep separate libraries: nothing syncs
+between them yet.
+
+**Build it:** `brew install xcodegen`, then `cd iOS && xcodegen` and open `PixoraPhone.xcodeproj`. The face models
+must be in `Models/` (see "Face detection and recognition"); Xcode compiles them into the app (about 107 MB). To
+install on your own iPhone, choose your Apple ID team under Signing in Xcode.
+
 ## What has and hasn't been verified
 
 **Verified on the development Mac (macOS 27, Apple M5):**
@@ -435,7 +469,17 @@ Pinch on the trackpad to zoom towards your fingers, up to 800%. Two-finger scrol
 - **Search:** the model was downloaded through the app from a local test server, checked, installed and used to deep scan a copy of a real 2,058-photo library (none unreadable, 1.6 to 1.8 seconds a photo). Results for searches like "a woman in a saree", "stairs" and "group of people" were checked by eye. A deep scan survived a forced quit and carried on. The tokenizer matches the model's own on 14 phrases in 7 scripts, and photo vectors agree with the measured model to 99.4% or better.
 - Screens checked by screenshot: Find Photos with Slideshow Studio, Private Space setup, locked and unlocked views.
 
+**Verified for iPhone (iOS 26.5 simulator, iPhone 17 Pro):**
+- UI tests tap through the real app: scan the LFW test card (4 pure groups, 69 of 83 faces grouped, the same as the
+  Mac), name people, Find with All (12 of 12 correct) and Any (35 of 35), the viewer, the save sheet, Slideshow
+  Studio and the player (starts muted with music turned on), and all of Private Space: create, keep a copy, lock,
+  wrong password, unlock, lock on switching tabs, make a person private (gone from Find while locked), and delete.
+- Import through the system Photos picker, then scan.
+- Dark mode and accessibility text sizes checked by screenshot. The Release build compiles for a real iPhone.
+
 **Not yet verified:**
+- The iPhone app on a real iPhone (signing needs your Apple ID), a card reader or USB drive on iPhone, picking a
+  folder in Files by hand, Save to Files and Share sheets end to end, VoiceOver by ear, and scanning speed on a phone.
 - A physical SD card or card reader, and real camera RAW files.
 - Clicking through every control by hand (screens were driven with launch-time test hooks), including full-screen
   slideshow playback on every display setup.

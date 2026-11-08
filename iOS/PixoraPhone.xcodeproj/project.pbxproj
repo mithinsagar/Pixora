@@ -1,0 +1,555 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0195477C4DFD895F0D508AAE /* VaultDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035347630532815B0A93125 /* VaultDesign.swift */; };
+		0474C1C8A14B19C5ADF241BC /* ReviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF6376C6B41DE1320E6B5A /* ReviewScreen.swift */; };
+		1CFC3C741B32CDFE8EB560CD /* ArcFaceR50.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = BC87609B3EDC2A9705CC2A51 /* ArcFaceR50.mlpackage */; };
+		42A3E3AFBFC562230FEE1239 /* PixoraPhoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3984A5C0C2543E3D30263F6 /* PixoraPhoneApp.swift */; };
+		5200529D64B1C38C9A6665ED /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469AF267DC4EB45C89A0B809 /* Design.swift */; };
+		5ED16CBC5E093DB2FE9A8CDF /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398187937F69331A955F53EA /* LibraryScreen.swift */; };
+		734DD6A9F558855B99C0ABA8 /* PhoneModel+Private.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F74EF34C58F3F9A6BFF4487 /* PhoneModel+Private.swift */; };
+		7D0D23E3CC613F15AD255D4D /* FindScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623E0EA9599881E0F9185CD /* FindScreen.swift */; };
+		8BC9DE8AACE2970B224B1B78 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393BD03C9029010CD8494B18 /* SettingsScreen.swift */; };
+		8EEA08FD92D85239A8787F09 /* SourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976AB404A9DA36A6F16A1092 /* SourceAccess.swift */; };
+		936AB762DE5FB1449E85DFAA /* PeopleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F57F8FD7867F1F32D6D1CED /* PeopleScreen.swift */; };
+		A0C50718ED8E7EB35A71A21D /* SlideshowStudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28E00E8C3B85132F13B1F30 /* SlideshowStudio.swift */; };
+		A3CD6D1D6340383800207C68 /* SCRFD10G.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = A6F071B8DBF26B96C2783158 /* SCRFD10G.mlpackage */; };
+		A7E5A9610408102F0CA2275C /* SlideshowPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17DF138A96477866F2EDB40 /* SlideshowPlayer.swift */; };
+		AC27AFAB76C4D4FBE6B0AA29 /* PixoraCore in Frameworks */ = {isa = PBXBuildFile; productRef = C8B753F4CF54D0909B11F0D7 /* PixoraCore */; };
+		B2C552694D615C58552D7D22 /* PhoneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81D15327F7B6E223ED26939 /* PhoneModel.swift */; };
+		B5243174620C47AFC378B84F /* FlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCAF24A7CE88E6875E05412 /* FlowTests.swift */; };
+		B71440F77A082E7220240121 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 205608181E56B071A783F995 /* Assets.xcassets */; };
+		C8F99EEAF86EF89A684672B7 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFC01D1EB2A992A9EB12618 /* Images.swift */; };
+		CBF0560CFEB099089D7FD4E6 /* ScanFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D895CCC101730701FA08C822 /* ScanFlow.swift */; };
+		D85AB9FA462240DC21008675 /* ExportFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC05524014DC09ECA594BF01 /* ExportFlow.swift */; };
+		DB7C4B020946A2658F1331D6 /* PrivateSpaceScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E69A04FA4AC2034263DBDEB /* PrivateSpaceScreen.swift */; };
+		DBEC42B9FC1BBE2552658765 /* PhotoViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B785C8058D3353CDE6DD9BD /* PhotoViewer.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5221477C6CE14317DBE8A02E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 569C3511E748C2B181E27FEF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C95306DCBAD3FB9C7BC6880F;
+			remoteInfo = PixoraPhone;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0CAF6376C6B41DE1320E6B5A /* ReviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScreen.swift; sourceTree = "<group>"; };
+		0CCAF24A7CE88E6875E05412 /* FlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowTests.swift; sourceTree = "<group>"; };
+		0FFC01D1EB2A992A9EB12618 /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
+		1F57F8FD7867F1F32D6D1CED /* PeopleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScreen.swift; sourceTree = "<group>"; };
+		2035347630532815B0A93125 /* VaultDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultDesign.swift; sourceTree = "<group>"; };
+		205608181E56B071A783F995 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		393BD03C9029010CD8494B18 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		398187937F69331A955F53EA /* LibraryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryScreen.swift; sourceTree = "<group>"; };
+		469AF267DC4EB45C89A0B809 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		4F74EF34C58F3F9A6BFF4487 /* PhoneModel+Private.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhoneModel+Private.swift"; sourceTree = "<group>"; };
+		5E69A04FA4AC2034263DBDEB /* PrivateSpaceScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateSpaceScreen.swift; sourceTree = "<group>"; };
+		8B785C8058D3353CDE6DD9BD /* PhotoViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewer.swift; sourceTree = "<group>"; };
+		970C2897ECF1648F87B61982 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		976AB404A9DA36A6F16A1092 /* SourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceAccess.swift; sourceTree = "<group>"; };
+		A17DF138A96477866F2EDB40 /* SlideshowPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideshowPlayer.swift; sourceTree = "<group>"; };
+		A6F071B8DBF26B96C2783158 /* SCRFD10G.mlpackage */ = {isa = PBXFileReference; path = SCRFD10G.mlpackage; sourceTree = "<group>"; };
+		AAC4D0ADE8E589D6459E3688 /* PixoraPhone.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PixoraPhone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B28E00E8C3B85132F13B1F30 /* SlideshowStudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideshowStudio.swift; sourceTree = "<group>"; };
+		B81D15327F7B6E223ED26939 /* PhoneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneModel.swift; sourceTree = "<group>"; };
+		BC87609B3EDC2A9705CC2A51 /* ArcFaceR50.mlpackage */ = {isa = PBXFileReference; path = ArcFaceR50.mlpackage; sourceTree = "<group>"; };
+		D2BB5D3AE537C83DBED1D6E2 /* PixoraPhoneUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PixoraPhoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D895CCC101730701FA08C822 /* ScanFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFlow.swift; sourceTree = "<group>"; };
+		DE466C26CF562861F61D1451 /* Rollcall */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Rollcall; path = ..; sourceTree = SOURCE_ROOT; };
+		E3984A5C0C2543E3D30263F6 /* PixoraPhoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixoraPhoneApp.swift; sourceTree = "<group>"; };
+		E623E0EA9599881E0F9185CD /* FindScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindScreen.swift; sourceTree = "<group>"; };
+		FC05524014DC09ECA594BF01 /* ExportFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportFlow.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		75A031FF1E8C7D5C79796631 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC27AFAB76C4D4FBE6B0AA29 /* PixoraCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A6069772C9A48B69C9F6D66 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BC87609B3EDC2A9705CC2A51 /* ArcFaceR50.mlpackage */,
+				A6F071B8DBF26B96C2783158 /* SCRFD10G.mlpackage */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3662E37B43068430047A164E /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				DE466C26CF562861F61D1451 /* Rollcall */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		3BB1B2528A57BE936C321F80 /* Rollcall */ = {
+			isa = PBXGroup;
+			children = (
+				0A6069772C9A48B69C9F6D66 /* Models */,
+			);
+			name = Rollcall;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		40E9EF40CE069F2F5CAADC21 = {
+			isa = PBXGroup;
+			children = (
+				3662E37B43068430047A164E /* Packages */,
+				5DF006AE59EE1E30D2336372 /* PixoraPhone */,
+				F0FDFA69B6A8235667589CEC /* PixoraPhoneUITests */,
+				3BB1B2528A57BE936C321F80 /* Rollcall */,
+				5A37E9EE3A5C6C331AE0A956 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5A37E9EE3A5C6C331AE0A956 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAC4D0ADE8E589D6459E3688 /* PixoraPhone.app */,
+				D2BB5D3AE537C83DBED1D6E2 /* PixoraPhoneUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5DF006AE59EE1E30D2336372 /* PixoraPhone */ = {
+			isa = PBXGroup;
+			children = (
+				205608181E56B071A783F995 /* Assets.xcassets */,
+				469AF267DC4EB45C89A0B809 /* Design.swift */,
+				FC05524014DC09ECA594BF01 /* ExportFlow.swift */,
+				E623E0EA9599881E0F9185CD /* FindScreen.swift */,
+				0FFC01D1EB2A992A9EB12618 /* Images.swift */,
+				970C2897ECF1648F87B61982 /* Info.plist */,
+				398187937F69331A955F53EA /* LibraryScreen.swift */,
+				1F57F8FD7867F1F32D6D1CED /* PeopleScreen.swift */,
+				B81D15327F7B6E223ED26939 /* PhoneModel.swift */,
+				4F74EF34C58F3F9A6BFF4487 /* PhoneModel+Private.swift */,
+				8B785C8058D3353CDE6DD9BD /* PhotoViewer.swift */,
+				E3984A5C0C2543E3D30263F6 /* PixoraPhoneApp.swift */,
+				5E69A04FA4AC2034263DBDEB /* PrivateSpaceScreen.swift */,
+				0CAF6376C6B41DE1320E6B5A /* ReviewScreen.swift */,
+				D895CCC101730701FA08C822 /* ScanFlow.swift */,
+				393BD03C9029010CD8494B18 /* SettingsScreen.swift */,
+				A17DF138A96477866F2EDB40 /* SlideshowPlayer.swift */,
+				B28E00E8C3B85132F13B1F30 /* SlideshowStudio.swift */,
+				976AB404A9DA36A6F16A1092 /* SourceAccess.swift */,
+				2035347630532815B0A93125 /* VaultDesign.swift */,
+			);
+			path = PixoraPhone;
+			sourceTree = "<group>";
+		};
+		F0FDFA69B6A8235667589CEC /* PixoraPhoneUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0CCAF24A7CE88E6875E05412 /* FlowTests.swift */,
+			);
+			path = PixoraPhoneUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C95306DCBAD3FB9C7BC6880F /* PixoraPhone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A428ECE3B76A916961119D7 /* Build configuration list for PBXNativeTarget "PixoraPhone" */;
+			buildPhases = (
+				69EDC624FD06DD199B4501EE /* Sources */,
+				B8A252DB73A9FFE0B6656A05 /* Resources */,
+				75A031FF1E8C7D5C79796631 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PixoraPhone;
+			packageProductDependencies = (
+				C8B753F4CF54D0909B11F0D7 /* PixoraCore */,
+			);
+			productName = PixoraPhone;
+			productReference = AAC4D0ADE8E589D6459E3688 /* PixoraPhone.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E9BA359E708259627EC77874 /* PixoraPhoneUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 59D5A0ADFC643BCEB8FE1AF4 /* Build configuration list for PBXNativeTarget "PixoraPhoneUITests" */;
+			buildPhases = (
+				75BD70652BBD7B57773DAC24 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6C961061ABC5CD15115A402B /* PBXTargetDependency */,
+			);
+			name = PixoraPhoneUITests;
+			packageProductDependencies = (
+			);
+			productName = PixoraPhoneUITests;
+			productReference = D2BB5D3AE537C83DBED1D6E2 /* PixoraPhoneUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		569C3511E748C2B181E27FEF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C95306DCBAD3FB9C7BC6880F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					E9BA359E708259627EC77874 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = C95306DCBAD3FB9C7BC6880F;
+					};
+				};
+			};
+			buildConfigurationList = CCA659BBEFB023FFDB9F6D59 /* Build configuration list for PBXProject "PixoraPhone" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 40E9EF40CE069F2F5CAADC21;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				39615892ACDB50FAAE33D6C0 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5A37E9EE3A5C6C331AE0A956 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C95306DCBAD3FB9C7BC6880F /* PixoraPhone */,
+				E9BA359E708259627EC77874 /* PixoraPhoneUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B8A252DB73A9FFE0B6656A05 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B71440F77A082E7220240121 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		69EDC624FD06DD199B4501EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CFC3C741B32CDFE8EB560CD /* ArcFaceR50.mlpackage in Sources */,
+				5200529D64B1C38C9A6665ED /* Design.swift in Sources */,
+				D85AB9FA462240DC21008675 /* ExportFlow.swift in Sources */,
+				7D0D23E3CC613F15AD255D4D /* FindScreen.swift in Sources */,
+				C8F99EEAF86EF89A684672B7 /* Images.swift in Sources */,
+				5ED16CBC5E093DB2FE9A8CDF /* LibraryScreen.swift in Sources */,
+				936AB762DE5FB1449E85DFAA /* PeopleScreen.swift in Sources */,
+				734DD6A9F558855B99C0ABA8 /* PhoneModel+Private.swift in Sources */,
+				B2C552694D615C58552D7D22 /* PhoneModel.swift in Sources */,
+				DBEC42B9FC1BBE2552658765 /* PhotoViewer.swift in Sources */,
+				42A3E3AFBFC562230FEE1239 /* PixoraPhoneApp.swift in Sources */,
+				DB7C4B020946A2658F1331D6 /* PrivateSpaceScreen.swift in Sources */,
+				0474C1C8A14B19C5ADF241BC /* ReviewScreen.swift in Sources */,
+				A3CD6D1D6340383800207C68 /* SCRFD10G.mlpackage in Sources */,
+				CBF0560CFEB099089D7FD4E6 /* ScanFlow.swift in Sources */,
+				8BC9DE8AACE2970B224B1B78 /* SettingsScreen.swift in Sources */,
+				A7E5A9610408102F0CA2275C /* SlideshowPlayer.swift in Sources */,
+				A0C50718ED8E7EB35A71A21D /* SlideshowStudio.swift in Sources */,
+				8EEA08FD92D85239A8787F09 /* SourceAccess.swift in Sources */,
+				0195477C4DFD895F0D508AAE /* VaultDesign.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		75BD70652BBD7B57773DAC24 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5243174620C47AFC378B84F /* FlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6C961061ABC5CD15115A402B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C95306DCBAD3FB9C7BC6880F /* PixoraPhone */;
+			targetProxy = 5221477C6CE14317DBE8A02E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		46F04B083B3BF8805B1465EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.pixora.PixoraPhoneUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PixoraPhone;
+			};
+			name = Release;
+		};
+		6D1E00AFAF70BA9CE0E061A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COREML_CODEGEN_LANGUAGE = None;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = PixoraPhone/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.pixora.Pixora;
+				PRODUCT_NAME = Pixora;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		CCE22F78E6A3B8534A8FEBB9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.3.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CD523C0C7A1F02AA45FD7B81 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COREML_CODEGEN_LANGUAGE = None;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = PixoraPhone/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.pixora.Pixora;
+				PRODUCT_NAME = Pixora;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		D363EDD79075A9D28411207D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.3.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F8FD113C50A4846DD868505B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.pixora.PixoraPhoneUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PixoraPhone;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		59D5A0ADFC643BCEB8FE1AF4 /* Build configuration list for PBXNativeTarget "PixoraPhoneUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F8FD113C50A4846DD868505B /* Debug */,
+				46F04B083B3BF8805B1465EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7A428ECE3B76A916961119D7 /* Build configuration list for PBXNativeTarget "PixoraPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD523C0C7A1F02AA45FD7B81 /* Debug */,
+				6D1E00AFAF70BA9CE0E061A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CCA659BBEFB023FFDB9F6D59 /* Build configuration list for PBXProject "PixoraPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D363EDD79075A9D28411207D /* Debug */,
+				CCE22F78E6A3B8534A8FEBB9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		39615892ACDB50FAAE33D6C0 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C8B753F4CF54D0909B11F0D7 /* PixoraCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixoraCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 569C3511E748C2B181E27FEF /* Project object */;
+}

@@ -15,11 +15,14 @@ struct PhotoGestureSurface: NSViewRepresentable {
     /// One notch of a plain mouse wheel: −1 back, 1 forward.
     var onWheelStep: (Int) -> Void = { _ in }
     var onHold: ((CGPoint) -> Void)? = nil
+    /// A plain mouse wheel zooms (instead of stepping between photos). Used where there is nothing to step through.
+    var wheelZooms = false
 
     func makeNSView(context: Context) -> SurfaceView { SurfaceView() }
     func updateNSView(_ view: SurfaceView, context: Context) {
         view.onZoom = onZoom; view.onZoomEnded = onZoomEnded; view.onPan = onPan; view.onToggle = onToggle
         view.onSwipe = onSwipe; view.onSwipeEnded = onSwipeEnded; view.onWheelStep = onWheelStep; view.onHold = onHold
+        view.wheelZooms = wheelZooms
         if view.zoomed != zoomed { view.zoomed = zoomed; view.window?.invalidateCursorRects(for: view) }
     }
 
@@ -33,6 +36,7 @@ struct PhotoGestureSurface: NSViewRepresentable {
         var onSwipeEnded: () -> Void = {}
         var onWheelStep: (Int) -> Void = { _ in }
         var onHold: ((CGPoint) -> Void)?
+        var wheelZooms = false
         private var swiping = false
         private var hold: DispatchWorkItem?
         private var travelled: CGFloat = 0
@@ -57,7 +61,7 @@ struct PhotoGestureSurface: NSViewRepresentable {
 
         override func scrollWheel(with event: NSEvent) {
             let step: CGFloat = event.hasPreciseScrollingDeltas ? 1 : 10
-            if event.modifierFlags.contains(.command) {   // zooming with a plain mouse wheel
+            if event.modifierFlags.contains(.command) || (wheelZooms && !event.hasPreciseScrollingDeltas) {   // zooming with a mouse wheel
                 onZoom(event.scrollingDeltaY * step * 0.01, point(event))
             } else if zoomed {
                 onPan(CGSize(width: event.scrollingDeltaX * step, height: event.scrollingDeltaY * step))

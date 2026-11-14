@@ -197,6 +197,12 @@ final class FlowTests: XCTestCase {
         app.buttons["Zoom"].tap()
         sleep(1)
         shot("42-review-zoomed")
+        app.buttons["Whole Photo"].tap()
+        sleep(1)
+        app.otherElements.firstMatch.pinch(withScale: 2.5, velocity: 2)   // two-finger pinch on the photo
+        sleep(1)
+        shot("43-review-pinched")
+        XCTAssertTrue(app.buttons["Whole Photo"].exists, "pinching zooms in")
         app.buttons["reviewfull.close"].tap()
         XCTAssertTrue(open.waitForExistence(timeout: 5), "closing returns to Review")
     }

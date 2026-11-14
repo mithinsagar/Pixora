@@ -4,7 +4,7 @@ import CoreGraphics
 
 /// Testing build only: plays a script of real input through the app's window, the same route events from the trackpad
 /// take, and reports how smoothly it drew. Steps separated by ";":
-/// wait S · section NAME · swipe DX DY [SECONDS] · pinch FACTOR · key NAME · click X Y · hold X Y · shot NAME · say TEXT · scroll DY · quit
+/// wait S · section NAME · swipe DX DY [SECONDS] · pinch FACTOR · wheel NOTCHES · key NAME · click X Y · hold X Y · shot NAME · say TEXT · scroll DY · quit
 @MainActor
 final class Rehearsal: NSObject {
     private static var current: Rehearsal?
@@ -53,6 +53,7 @@ final class Rehearsal: NSObject {
                 if let w = window { w.setFrame(NSRect(x: 0, y: 0, width: n[0], height: n[1]), display: true) }
                 try? await Task.sleep(for: .seconds(1))
             case "pinch": await pinch(n[0])
+            case "wheel": await wheel(Int32(n[0]))
             case "key": key(step[1])
             case "click": await click(CGPoint(x: n[0], y: n[1]), hold: 0)
             case "hold": await click(CGPoint(x: n[0], y: n[1]), hold: 0.7)
@@ -115,6 +116,19 @@ final class Rehearsal: NSObject {
         e.timestamp = CGEventTimestamp(time * 1e9)
         place(e, at: p)
         if let ns = NSEvent(cgEvent: e) { if viaQueue { NSApp.postEvent(ns, atStart: false) } else { window?.sendEvent(ns) } }
+    }
+
+    /// Notches of a plain (non-trackpad) mouse wheel: positive scrolls up.
+    private func wheel(_ notches: Int32) async {
+        for _ in 0..<abs(notches) {
+            guard let e = CGEvent(scrollWheelEvent2Source: nil, units: .line, wheelCount: 1, wheel1: notches > 0 ? 1 : -1, wheel2: 0, wheel3: 0) else { continue }
+            e.setIntegerValueField(.scrollWheelEventIsContinuous, value: 0)
+            place(e, at: centre)
+            if let ns = NSEvent(cgEvent: e) { window?.sendEvent(ns) }
+            try? await Task.sleep(for: .milliseconds(60))
+        }
+        try? await Task.sleep(for: .milliseconds(400))
+        log("wheel \(notches)")
     }
 
     private func swipe(dx: Double, dy: Double, seconds: Double) async {

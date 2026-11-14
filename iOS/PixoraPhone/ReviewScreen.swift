@@ -204,7 +204,10 @@ struct ReviewFullScreen: View {
     @State private var answered: Set<Int64> = []
     @State private var image: UIImage?
     @State private var isPreview = false
-    @State private var zoomed = false
+    @State private var zoom = ViewerZoom()
+    @State private var stageSize: CGSize = .zero
+    @State private var pinchBase: CGFloat?
+    @State private var lastDrag: CGSize = .zero
 
     private var face: Face? { faces.indices.contains(index) ? faces[index] : nil }
 
@@ -236,8 +239,8 @@ struct ReviewFullScreen: View {
             .accessibilityIdentifier("reviewfull.close")
             Text("\(index + 1) of \(faces.count)").font(.subheadline.weight(.semibold)).foregroundStyle(.white.opacity(0.8))
             Spacer()
-            Button { withAnimation(Motion.spring) { zoomed.toggle() } } label: {
-                Label(zoomed ? "Whole Photo" : "Zoom", systemImage: zoomed ? "arrow.down.right.and.arrow.up.left" : "plus.magnifyingglass")
+            Button { toggleFaceZoom() } label: {
+                Label(zoom.isZoomed ? "Whole Photo" : "Zoom", systemImage: zoom.isZoomed ? "arrow.down.right.and.arrow.up.left" : "plus.magnifyingglass")
                     .font(.subheadline.weight(.semibold)).foregroundStyle(.white).padding(.horizontal, 12).frame(minHeight: 44)
                     .background(Capsule().fill(.white.opacity(0.14)))
             }
@@ -245,46 +248,81 @@ struct ReviewFullScreen: View {
         .padding(.horizontal, 12).padding(.top, 8)
     }
 
+    /// Pinch to zoom, drag to move when zoomed in, double-tap to zoom to the face or back to the whole photo.
     private func stage(_ face: Face) -> some View {
         GeometryReader { geo in
-            if let image {
-                let fit = fitted(image.size, in: geo.size)
-                let box = CGRect(x: face.rect.minX * fit.width, y: face.rect.minY * fit.height,
-                                 width: face.rect.width * fit.width, height: face.rect.height * fit.height)
-                // Zoom so the face fills about half the height (at least 1.6×), centred on it as far as the photo's
-                // edges allow, so the zoomed photo never slides off and leaves empty space.
-                let scale = zoomed ? min(6, max(1.6, fit.height * 0.5 / max(box.height, 1))) : 1
-                let maxX = max(0, (fit.width * scale - geo.size.width) / 2), maxY = max(0, (fit.height * scale - geo.size.height) / 2)
-                let shift = zoomed ? CGSize(width: min(maxX, max(-maxX, (fit.width / 2 - box.midX) * scale)),
-                                            height: min(maxY, max(-maxY, (fit.height / 2 - box.midY) * scale))) : .zero
-                ZStack(alignment: .topLeading) {
-                    Image(uiImage: image).resizable().frame(width: fit.width, height: fit.height)
-                    // Dim everything except the face in question.
-                    Path { p in
-                        p.addRect(CGRect(origin: .zero, size: fit))
-                        p.addRoundedRect(in: box.insetBy(dx: -box.width * 0.125, dy: -box.height * 0.125),
-                                         cornerSize: CGSize(width: box.width * 0.12, height: box.width * 0.12))
-                    }
-                    .fill(.black.opacity(0.5), style: FillStyle(eoFill: true))
-                    RoundedRectangle(cornerRadius: box.width * 0.12)
-                        .strokeBorder(Palette.safelight, lineWidth: 3 / scale)
-                        .frame(width: box.width * 1.25, height: box.height * 1.25)
-                        .position(x: box.midX, y: box.midY)
+            ZStack {
+                if let image {
+                    photoLayer(face, image)
+                        .frame(width: fit.width, height: fit.height)
+                        .scaleEffect(zoom.scale)
+                        .offset(zoom.offset)
+                        .accessibilityLabel("The whole photo, with the face in question outlined")
+                } else {
+                    ProgressView().tint(.white)
                 }
-                .frame(width: fit.width, height: fit.height)
-                .scaleEffect(scale)
-                .offset(shift)
-                .frame(width: geo.size.width, height: geo.size.height)
-                .clipped()
-                .animation(reduceMotion ? nil : Motion.spring, value: zoomed)
-                .contentShape(Rectangle())
-                .onTapGesture(count: 2) { withAnimation(Motion.spring) { zoomed.toggle() } }
-                .accessibilityLabel("The whole photo, with the face in question outlined")
-            } else {
-                ProgressView().tint(.white).frame(width: geo.size.width, height: geo.size.height)
             }
+            .frame(width: geo.size.width, height: geo.size.height)
+            .clipped()
+            .contentShape(Rectangle())
+            .gesture(MagnifyGesture()
+                .onChanged { v in
+                    let base = pinchBase ?? zoom.scale
+                    pinchBase = base
+                    let p = CGPoint(x: v.startLocation.x - geo.size.width / 2, y: v.startLocation.y - geo.size.height / 2)
+                    zoom.zoom(to: base * v.magnification, around: p, image: fit, viewport: geo.size)
+                }
+                .onEnded { _ in
+                    pinchBase = nil
+                    if zoom.scale < 1.05 { withAnimation(spring) { zoom = ViewerZoom() } }
+                })
+            .simultaneousGesture(DragGesture(minimumDistance: 5)
+                .onChanged { v in
+                    guard zoom.isZoomed else { return }
+                    zoom.pan(by: CGSize(width: v.translation.width - lastDrag.width, height: v.translation.height - lastDrag.height),
+                             image: fit, viewport: geo.size)
+                    lastDrag = v.translation
+                }
+                .onEnded { _ in lastDrag = .zero })
+            .onTapGesture(count: 2) { toggleFaceZoom() }
+            .onAppear { stageSize = geo.size }
+            .onChange(of: geo.size) { _, size in stageSize = size }
         }
         .padding(.vertical, 8)
+    }
+
+    private func photoLayer(_ face: Face, _ image: UIImage) -> some View {
+        let box = CGRect(x: face.rect.minX * fit.width, y: face.rect.minY * fit.height,
+                         width: face.rect.width * fit.width, height: face.rect.height * fit.height)
+        return ZStack(alignment: .topLeading) {
+            Image(uiImage: image).resizable().frame(width: fit.width, height: fit.height)
+            // Dim everything except the face in question.
+            Path { p in
+                p.addRect(CGRect(origin: .zero, size: fit))
+                p.addRoundedRect(in: box.insetBy(dx: -box.width * 0.125, dy: -box.height * 0.125),
+                                 cornerSize: CGSize(width: box.width * 0.12, height: box.width * 0.12))
+            }
+            .fill(.black.opacity(0.5), style: FillStyle(eoFill: true))
+            RoundedRectangle(cornerRadius: box.width * 0.12)
+                .strokeBorder(Palette.safelight, lineWidth: 3 / zoom.scale)
+                .frame(width: box.width * 1.25, height: box.height * 1.25)
+                .position(x: box.midX, y: box.midY)
+        }
+    }
+
+    private var fit: CGSize { image.map { fitted($0.size, in: stageSize) } ?? .zero }
+    private var spring: Animation? { reduceMotion ? nil : Motion.spring }
+
+    /// Fill about half the height with the face and centre it, as far as the photo's edges allow; again to fit.
+    private func toggleFaceZoom() {
+        guard let face, image != nil else { return }
+        if zoom.isZoomed { withAnimation(spring) { zoom = ViewerZoom() }; return }
+        let s = min(ViewerZoom.maxScale, max(1.6, 0.5 / max(face.rect.height, 0.01)))
+        let p = CGPoint(x: (face.rect.midX - 0.5) * fit.width, y: (face.rect.midY - 0.5) * fit.height)
+        var z = ViewerZoom()
+        z.zoom(to: s, around: .zero, image: fit, viewport: stageSize)
+        z.pan(by: CGSize(width: -p.x * s, height: -p.y * s), image: fit, viewport: stageSize)
+        withAnimation(spring) { zoom = z }
     }
 
     private func fitted(_ size: CGSize, in box: CGSize) -> CGSize {
@@ -333,13 +371,13 @@ struct ReviewFullScreen: View {
         if yes { model.confirm([face.id]) } else { model.reject([face.id]) }
         onAnswered(face.id)
         let order = Array(faces.indices.dropFirst(index + 1)) + Array(faces.indices.prefix(index))
-        if let next = order.first(where: { !answered.contains(faces[$0].id) }) { zoomed = false; index = next } else { dismiss() }
+        if let next = order.first(where: { !answered.contains(faces[$0].id) }) { zoom = ViewerZoom(); index = next } else { dismiss() }
     }
 
     private func step(_ d: Int) {
         let next = index + d
         guard faces.indices.contains(next) else { return }
-        zoomed = false
+        zoom = ViewerZoom()
         index = next
     }
 

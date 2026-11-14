@@ -47,7 +47,10 @@ public struct LibraryStats: Sendable {
     public var recognizableFaces = 0
     public var people = 0
     public var namedPeople = 0
+    /// Groups to name plus uncertain faces to answer (the Mac Review page has both).
     public var reviewItems = 0
+    /// Uncertain faces to answer only: suggestions for named, non-private people.
+    public var uncertainItems = 0
     public var facesFromOtherEmbedder = 0
     public var databaseBytes: Int64 = 0
     public var thumbnailBytes: Int64 = 0
@@ -321,9 +324,14 @@ public final class LibraryStore: @unchecked Sendable {
         try db.read { try $0.query("SELECT thumb FROM faces WHERE id = ?", [id]) { $0.blob(0) }.first ?? nil }
     }
 
+    /// Faces suggested for someone the user has named (and who isn't private). Only these are asked about in
+    /// Review: "Is this Unnamed?" isn't a question anyone can answer. Borderline matches to an unnamed group stay
+    /// with that group and show up here once it's named.
+    static let reviewableUncertain = "state = 1 AND person_id IN (SELECT id FROM people WHERE name IS NOT NULL AND is_private = 0)"
+
     /// Borderline matches waiting for a yes/no, best first.
     public func uncertainFaces(limit: Int = 500) throws -> [Face] {
-        try db.read { try $0.query("SELECT \(Self.faceColumns) FROM faces WHERE state = 1 ORDER BY score DESC LIMIT ?", [limit], Self.face) }
+        try db.read { try $0.query("SELECT \(Self.faceColumns) FROM faces WHERE \(Self.reviewableUncertain) ORDER BY score DESC LIMIT ?", [limit], Self.face) }
     }
 
     /// Recognisable faces that matched nobody and grouped with nothing.
@@ -574,8 +582,8 @@ public final class LibraryStore: @unchecked Sendable {
             s.recognizableFaces = Int(try c.scalar("SELECT COUNT(*) FROM faces WHERE embedding IS NOT NULL"))
             s.people = Int(try c.scalar("SELECT COUNT(*) FROM people WHERE is_private = 0"))
             s.namedPeople = Int(try c.scalar("SELECT COUNT(*) FROM people WHERE name IS NOT NULL AND is_private = 0"))
-            s.reviewItems = Int(try c.scalar("SELECT COUNT(*) FROM faces WHERE state = 1"))
-                + Int(try c.scalar("SELECT COUNT(*) FROM people WHERE name IS NULL AND is_private = 0"))
+            s.uncertainItems = Int(try c.scalar("SELECT COUNT(*) FROM faces WHERE \(Self.reviewableUncertain)"))
+            s.reviewItems = s.uncertainItems + Int(try c.scalar("SELECT COUNT(*) FROM people WHERE name IS NULL AND is_private = 0"))
             s.facesFromOtherEmbedder = Int(try c.scalar("SELECT COUNT(*) FROM faces WHERE embedding IS NOT NULL AND embedder != ?", [currentEmbedder]))
         }
         let fm = FileManager.default

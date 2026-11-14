@@ -22,7 +22,7 @@ struct PeopleScreen: View {
                                    actionTitle: "Go to Library", action: { model.tab = .library })
                             .padding(.top, 40)
                     } else {
-                        if model.stats.reviewItems > 0 { reviewBanner }
+                        if model.stats.uncertainItems > 0 { reviewBanner }
                         if !named.isEmpty {
                             section("Named", count: named.count)
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 14)], spacing: 18) {
@@ -86,7 +86,7 @@ struct PeopleScreen: View {
             HStack(spacing: 12) {
                 Image(systemName: "checkmark.bubble.fill").font(.title2).foregroundStyle(Palette.safelight)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("\(Format.count(model.stats.reviewItems, "face")) to check").font(.headline).foregroundStyle(Palette.ink)
+                    Text("\(Format.count(model.stats.uncertainItems, "face")) to check").font(.headline).foregroundStyle(Palette.ink)
                     Text("Quick yes-or-no answers make every match better.").font(.subheadline).foregroundStyle(Palette.ink2)
                 }
                 Spacer()

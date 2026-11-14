@@ -67,7 +67,7 @@ struct RootView: View {
                 .tag(PhoneTab.library)
             ReviewScreen()
                 .tabItem { Label("Review", systemImage: "checkmark.bubble") }
-                .badge(model.stats.reviewItems)
+                .badge(model.stats.uncertainItems)
                 .tag(PhoneTab.review)
             PrivateSpaceScreen()
                 .tabItem { Label("Private", systemImage: model.isPrivateUnlocked ? "lock.open" : "lock") }

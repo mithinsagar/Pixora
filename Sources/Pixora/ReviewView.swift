@@ -142,6 +142,12 @@ private struct UncertainReview: View {
     @AppStorage("uncertainMode") private var allAtOnce = true
     @State private var confirmAll = false
 
+    /// The order faces are shown in (grouped by suggested person in the grid), so full screen follows it.
+    private var ordered: [Face] {
+        guard allAtOnce else { return faces }
+        return UncertainGrid.groups(faces).flatMap(\.value)
+    }
+
     var body: some View {
         if faces.isEmpty {
             EmptyState(symbol: "checkmark.seal", title: "Nothing uncertain", message: "Borderline matches show up here instead of silently counting as matches.")
@@ -153,12 +159,16 @@ private struct UncertainReview: View {
                         Text("One by one").tag(false)
                     }.pickerStyle(.segmented).labelsHidden().fixedSize()
                     Spacer()
+                    Button { model.reviewFull = ReviewFullRequest(faces: ordered, start: 0) } label: {
+                        Label("Review Full Screen", systemImage: "arrow.up.left.and.arrow.down.right")
+                    }
+                    .help("Go through every uncertain face on the whole photo, full screen. Click any face to start from it.")
                     Button { confirmAll = true } label: { Label("Accept All \(faces.count)", systemImage: "checkmark.circle.fill") }
                         .buttonStyle(PrimaryButtonStyle())
                         .help("Confirm every suggestion on this tab")
                 }
                 .padding(.horizontal, 24).padding(.vertical, 12)
-                if allAtOnce { UncertainGrid(faces: faces) } else { UncertainOneByOne(faces: faces) }
+                if allAtOnce { UncertainGrid(faces: faces, ordered: ordered) } else { UncertainOneByOne(faces: faces) }
             }
             .confirmationDialog("Accept all \(faces.count) suggestions?", isPresented: $confirmAll) {
                 Button("Accept All") { model.confirmAllUncertain() }
@@ -171,9 +181,14 @@ private struct UncertainReview: View {
 private struct UncertainGrid: View {
     @Environment(AppModel.self) private var model
     let faces: [Face]
+    let ordered: [Face]
+
+    static func groups(_ faces: [Face]) -> [(key: Int64, value: [Face])] {
+        Dictionary(grouping: faces, by: { $0.personID ?? -1 }).sorted { ($0.value.count, $1.key) > ($1.value.count, $0.key) }
+    }
 
     var body: some View {
-        let groups = Dictionary(grouping: faces, by: { $0.personID ?? -1 }).sorted { $0.value.count > $1.value.count }
+        let groups = Self.groups(faces)
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 18) {
                 ForEach(groups, id: \.key) { pid, list in
@@ -192,7 +207,11 @@ private struct UncertainGrid: View {
                                     .buttonStyle(PrimaryButtonStyle())
                             }
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 12) {
-                                ForEach(list) { f in UncertainFaceCell(face: f, personName: person.displayName) }
+                                ForEach(list) { f in
+                                    UncertainFaceCell(face: f, personName: person.displayName) {
+                                        model.reviewFull = ReviewFullRequest(faces: ordered, start: ordered.firstIndex(of: f) ?? 0)
+                                    }
+                                }
                             }
                         }
                         .padding(16).cardBackground()
@@ -208,9 +227,12 @@ private struct UncertainFaceCell: View {
     @Environment(AppModel.self) private var model
     let face: Face
     let personName: String
+    let open: () -> Void
     @State private var hovering = false
     var body: some View {
         FaceImage(faceID: face.id, size: 104)
+            .contentShape(Rectangle())
+            .onTapGesture(perform: open)
             .overlay(alignment: .bottom) {
                 if hovering {
                     HStack(spacing: 8) {
@@ -227,7 +249,7 @@ private struct UncertainFaceCell: View {
             .hoverLift(scale: 1.06, radius: 10, glow: true, cursor: false)
             .onHover { inside in withAnimation(.easeOut(duration: 0.15)) { hovering = inside } }
             .onDrag { NSItemProvider(object: "pixora-face:\(face.id)" as NSString) }
-            .help("Hover for ✓ / ✗ · drag onto someone in the sidebar to assign to them instead")
+            .help("Click to see the whole photo full screen · hover for ✓ / ✗ · drag onto someone in the sidebar to assign to them instead")
     }
 }
 
@@ -235,6 +257,10 @@ private struct UncertainOneByOne: View {
     @Environment(AppModel.self) private var model
     let faces: [Face]
     @State private var index = 0
+
+    private func openFull() {
+        model.reviewFull = ReviewFullRequest(faces: faces, start: min(index, faces.count - 1))
+    }
     @State private var refs: [Face] = []
     @State private var context: NSImage?
 
@@ -255,10 +281,14 @@ private struct UncertainOneByOne: View {
                 VStack(spacing: 10) {
                     Text("Is this \(person?.displayName ?? "them")?").font(.headline)
                     FaceImage(faceID: face.id, size: 200, shape: AnyShape(RoundedRectangle(cornerRadius: 18, style: .continuous)))
-                        .hoverLift(scale: 1.03, radius: 18, glow: true, cursor: false)
+                        .hoverLift(scale: 1.03, radius: 18, glow: true, cursor: true)
+                        .onTapGesture { openFull() }
+                        .help("Click to review full screen")
                     if let context {
                         Image(nsImage: context).resizable().scaledToFit().frame(maxWidth: 260, maxHeight: 170)
                             .clipShape(RoundedRectangle(cornerRadius: 6)).accessibilityLabel("The photo this face is from")
+                            .onTapGesture { openFull() }
+                            .help("Click to review full screen")
                     }
                     Text("Borderline similarity — Pixora won’t count this until you decide.").font(.caption).foregroundStyle(Palette.ink2)
                 }.frame(width: 280)
@@ -271,9 +301,10 @@ private struct UncertainOneByOne: View {
                 Button { model.confirm([face.id]) } label: { Label("Yes, it’s \(person?.displayName ?? "them")", systemImage: "checkmark") }
                     .buttonStyle(PrimaryButtonStyle()).keyboardShortcut("y", modifiers: [])
             }
-            Text("Keyboard: Y yes · N no · → skip").font(.caption).foregroundStyle(Palette.ink2)
+            Text("Keyboard: Y yes · N no · → skip · click the face or photo for full screen").font(.caption).foregroundStyle(Palette.ink2)
         }
         .padding(32).frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onTapGesture(count: 2) { openFull() }
         .task(id: face.id) {
             refs = face.personID.flatMap { try? model.store.faces(personID: $0) } ?? []
             if let p = try? model.store.photos(ids: [face.photoID]).first {

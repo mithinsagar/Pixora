@@ -58,6 +58,26 @@ final class FeatureTests: XCTestCase {
         XCTAssertNil(map[d]!, "a photo 7.5 s later is not part of the burst")
     }
 
+    func testReviewAsksOnlyAboutNamedPeople() throws {
+        let store = try makeStore()
+        let src = try store.addSource(url: tmp)
+        let ana = try store.createPerson(name: "Ana"), group = try store.createPerson(name: nil)
+        try photo(store, src.id, "1.jpg", faces: [(ana, .confirmed, 300), (ana, .suggested, 300)])
+        try photo(store, src.id, "2.jpg", faces: [(group, .auto, 300), (group, .suggested, 300)])
+        let asked = try store.uncertainFaces()
+        XCTAssertEqual(asked.map(\.personID), [ana], "no “Is this Unnamed?” questions")
+        let stats = try store.stats(currentEmbedder: "x")
+        XCTAssertEqual(stats.uncertainItems, 1, "the question count matches what Review asks")
+        XCTAssertEqual(stats.reviewItems, 2, "the Mac badge adds the unnamed group to name")
+        try store.confirmAllUncertain()
+        let states = try store.db.read { try $0.query("SELECT person_id, state FROM faces WHERE state <> 2") { ($0.int(0), $0.int(1)) } }
+        XCTAssertFalse(states.contains { $0 == (ana, 1) }, "Ana's suggestion was accepted")
+        XCTAssertTrue(states.contains { $0 == (group, 1) }, "Accept All leaves the unnamed group's suggestion alone")
+        // Once the group gets a name, its suggestion is asked about.
+        _ = try store.name(personID: group, as: "Ben")
+        XCTAssertEqual(try store.uncertainFaces().count, 1)
+    }
+
     func testAcceptAllUncertainForOnePerson() throws {
         let store = try makeStore()
         let src = try store.addSource(url: tmp)

@@ -110,8 +110,10 @@ final class AppModel {
     var viewer: ViewerState?
     var quickPick: QuickPickRequest?
     var faceTime: FaceTimeRequest?
+    /// Uncertain matches reviewed over the whole window.
+    var reviewFull: ReviewFullRequest?
     /// A full-window photo screen is showing.
-    var isImmersive: Bool { viewer != nil || quickPick != nil || faceTime != nil }
+    var isImmersive: Bool { viewer != nil || quickPick != nil || faceTime != nil || reviewFull != nil }
     /// The window's undo manager (set by ContentView), so ⌘Z / ⇧⌘Z undo and redo corrections.
     weak var undoManager: UndoManager?
     var toast: Toast?
@@ -214,6 +216,8 @@ final class AppModel {
         #if PIXORA_UI_TESTING
         switch env["PIXORA_TEST_OPEN"] {
         case "scan": if let source = sources.first { rescan(source) }
+        case "reviewfull":
+            if let faces = try? store.uncertainFaces(), !faces.isEmpty { section = .review; reviewFull = ReviewFullRequest(faces: faces, start: 0) }
         case "quickpick": quickPick = QuickPickRequest(title: querySentence, photos: visibleResults.map(\.photo))
         case "facetime":
             if let id = selectedPeople.first, let p = person(id) { faceTime = FaceTimeRequest(personID: id, name: p.displayName) }

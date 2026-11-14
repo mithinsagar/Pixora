@@ -28,6 +28,8 @@ enum Palette {
     static let safelight = Color.dynamic(light: 0xB4471A, dark: 0xF0874A)
     static let onSafelight = Color.dynamic(light: 0xFFFFFF, dark: 0x1A0E06)
     static let confirmed = Color.dynamic(light: 0x2F6B4F, dark: 0x7FC8A0)
+    /// Text on a `confirmed` fill: white on the dark green, near-black on the light green used in dark mode.
+    static let onConfirmed = Color.dynamic(light: 0xFFFFFF, dark: 0x0B2A1A)
     static let warning = Color.dynamic(light: 0x9A5B00, dark: 0xF0B35A)
 }
 

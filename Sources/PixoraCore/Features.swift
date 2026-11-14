@@ -226,11 +226,11 @@ extension LibraryStore {
         }
     }
 
-    /// Accept every uncertain suggestion — for one person, or for everyone.
+    /// Accept every uncertain suggestion: for one person, or for everyone Review lists (named, not private).
     public func confirmAllUncertain(personID: Int64? = nil) throws {
         try db.write { c in
             if let personID { try c.run("UPDATE faces SET state = 3 WHERE state = 1 AND person_id = ?", personID) }
-            else { try c.run("UPDATE faces SET state = 3 WHERE state = 1 AND person_id IS NOT NULL") }
+            else { try c.run("UPDATE faces SET state = 3 WHERE \(LibraryStore.reviewableUncertain)") }   // only what Review shows
         }
     }
 

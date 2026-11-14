@@ -142,10 +142,7 @@ final class FlowTests: XCTestCase {
         app.buttons["private.unlock"].tap()
         XCTAssertTrue(app.staticTexts["private.error"].waitForExistence(timeout: 15))
         shot("24-private-wrong")
-        app.secureTextFields["private.password"].tap()
-        app.secureTextFields["private.password"].press(forDuration: 1.2)
-        if app.menuItems["Select All"].waitForExistence(timeout: 2) { app.menuItems["Select All"].tap() }
-        app.secureTextFields["private.password"].typeText(XCUIKeyboardKey.delete.rawValue)
+        XCTAssertEqual(app.secureTextFields["private.password"].value as? String ?? "", "Password", "the field empties after a wrong password")
         unlock(password)
 
         // Leaving the tab locks it.
@@ -183,6 +180,25 @@ final class FlowTests: XCTestCase {
         app.buttons["private.delete"].tap()
         XCTAssertTrue(app.staticTexts["You can start again"].waitForExistence(timeout: 10))
         shot("29-private-deleted")
+    }
+
+    func test4_ReviewFullScreen() {
+        app.launch()
+        if app.staticTexts["Scan complete"].waitForExistence(timeout: app.launchEnvironment["PIXORA_AUTOSCAN"] == nil ? 3 : 240) { app.buttons["Done"].tap() }
+        tab("Review")
+        let open = app.buttons["review.fullscreen"].firstMatch
+        guard open.waitForExistence(timeout: 5) else { shot("40-review-nothing"); return }
+        XCTAssertFalse(app.staticTexts["Is this Unnamed?"].exists, "never asks about unnamed groups")
+        shot("40-review")
+        open.tap()
+        XCTAssertTrue(app.buttons["reviewfull.yes"].waitForExistence(timeout: 5))
+        sleep(1)
+        shot("41-review-fullscreen")
+        app.buttons["Zoom"].tap()
+        sleep(1)
+        shot("42-review-zoomed")
+        app.buttons["reviewfull.close"].tap()
+        XCTAssertTrue(open.waitForExistence(timeout: 5), "closing returns to Review")
     }
 
     private func unlock(_ password: String) {

@@ -44,6 +44,8 @@ struct ContentView: View {
         .overlay { if let r = model.quickPick { QuickPickView(request: r).id(r.id).ignoresSafeArea().transition(.opacity) } }
         .overlay { if let r = model.faceTime { FaceTimeView(request: r).id(r.id).ignoresSafeArea().transition(.opacity) } }
         .overlay { if model.viewer != nil { PhotoViewer().id(model.viewer?.id).ignoresSafeArea() } }
+        .overlay { if let r = model.reviewFull { ReviewFullScreen(request: r).id(r.id).ignoresSafeArea().transition(.opacity) } }
+        .animation(.easeOut(duration: 0.22), value: model.reviewFull?.id)
         .overlay { if let s = model.slideshow { SlideshowPlayer(request: s).id(s.id).transition(.opacity) } }
         .animation(.easeOut(duration: 0.22), value: model.quickPick?.id)
         .animation(.easeOut(duration: 0.28), value: model.faceTime?.id)

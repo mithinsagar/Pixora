@@ -256,6 +256,7 @@ private struct PrivateUnlock: View {
                 password = ""
             } catch {
                 self.error = error.localizedDescription
+                password = ""   // start fresh, like the system lock screen
                 withAnimation(.linear(duration: 0.3)) { shake += 1 }
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
             }

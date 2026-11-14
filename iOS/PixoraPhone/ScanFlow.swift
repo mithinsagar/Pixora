@@ -392,7 +392,7 @@ struct ScanSheet: View {
                     .card()
                 }
                 VStack(spacing: 10) {
-                    if model.stats.reviewItems > 0 || !model.unnamedGroups.isEmpty {
+                    if model.stats.uncertainItems > 0 || !model.unnamedGroups.isEmpty {
                         Button("Name People and Review") { model.scan = nil; model.tab = model.unnamedGroups.isEmpty ? .review : .people }
                             .buttonStyle(PrimaryButtonStyle())
                     }

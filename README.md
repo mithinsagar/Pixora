@@ -9,6 +9,16 @@ Everything runs on your Mac. No account, and no photo, face or name leaves it. O
 
 **Made by Mithin Sagar** · [mithinsagarofficial@gmail.com](mailto:mithinsagarofficial@gmail.com)
 
+![Pixora: find every photo of anyone](docs/screenshots/01-find-people.jpg)
+
+<table>
+<tr><td><img src="docs/screenshots/02-together.jpg" alt="Photos of people together"></td><td><img src="docs/screenshots/03-people.jpg" alt="People grouped by face"></td></tr>
+<tr><td><img src="docs/screenshots/04-review.jpg" alt="Review"></td><td><img src="docs/screenshots/05-review-full-screen.jpg" alt="Full-screen review"></td></tr>
+<tr><td><img src="docs/screenshots/06-search.jpg" alt="Search by what is in the photo"></td><td><img src="docs/screenshots/07-viewer.jpg" alt="Viewer"></td></tr>
+<tr><td><img src="docs/screenshots/08-quick-pick.jpg" alt="Quick Pick"></td><td><img src="docs/screenshots/09-through-time.jpg" alt="Through Time"></td></tr>
+<tr><td><img src="docs/screenshots/10-insights.jpg" alt="Insights"></td><td><img src="docs/screenshots/11-themes.jpg" alt="Themes"></td></tr>
+</table>
+
 ## Download and install
 
 1. Download the **Pixora .dmg** from the [latest release](../../releases/latest).

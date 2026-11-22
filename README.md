@@ -56,6 +56,20 @@ app still runs in a clearly labelled **Basic** mode, but Basic mode cannot relia
 Pixora keeps its library in `~/Library/Application Support/Pixora`. Setting `PIXORA_HOME=/some/folder` points
 it at a separate library, which is useful for trying it out without touching your real one.
 
+## iPhone app
+
+The repository also has an iPhone version built on the same face engine (`PixoraCore`), with five tabs: Find,
+People, Library, Review and Private. Photos come from your Photos library or the Files app (copied into Pixora), or
+from a folder or card reader picked in Files (read where it is). Search by content, Places, Quick Pick and Through
+Time are Mac only for now, and the Mac and iPhone libraries don't sync.
+
+It isn't on the App Store or TestFlight, because that needs a paid Apple Developer account, so you build it yourself:
+
+1. Build the face models once (step 1 of *Build and run* above); the iPhone app includes them.
+2. Open `iOS/PixoraPhone.xcodeproj` in Xcode (or regenerate it with `brew install xcodegen` and `cd iOS && xcodegen`).
+3. Under *Signing & Capabilities*, choose your own Apple ID team, then run it on an iPhone with iOS 17 or later.
+   With a free Apple ID the app has to be reinstalled every 7 days.
+
 ## How it works
 
 | Step | What happens | Where |
